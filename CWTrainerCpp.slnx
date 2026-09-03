@@ -3,5 +3,5 @@
     <Platform Name="x64" />
     <Platform Name="x86" />
   </Configurations>
-  <Project Path="CWTrainerCpp.vcxproj" />
+  <Project Path="CWTrainerCpp.vcxproj" Id="7b67e91b-dbca-40e4-abb4-d8752ce20ed4" />
 </Solution>
