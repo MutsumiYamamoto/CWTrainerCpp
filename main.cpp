@@ -24,29 +24,25 @@ int main()
     bool tPressed = false;
     bool spacePressed = false;
 
-    std::cout << "CW Trainer Test Mode\n";
+    std::cout << "CW Trainer Test\n";
     std::cout << "H = DIT(.)\n";
     std::cout << "T = DAH(-)\n";
-    std::cout << "SPACE = Decode\n\n";
+    std::cout << "SPACE = Decode\n";
+    std::cout << "ESC = Exit\n\n";
 
     while (true)
     {
-        bool hNow =
-            (GetAsyncKeyState('H') & 0x8000) != 0;
+        bool hNow = (GetAsyncKeyState('H') & 0x8000) != 0;
 
-        bool tNow =
-            (GetAsyncKeyState('T') & 0x8000) != 0;
+        bool tNow = (GetAsyncKeyState('T') & 0x8000) != 0;
 
-        bool spaceNow =
-            (GetAsyncKeyState(VK_SPACE) & 0x8000) != 0;
+        bool spaceNow = (GetAsyncKeyState(VK_SPACE) & 0x8000) != 0;
 
         // H = DIT
         if (hNow && !hPressed)
         {
             currentCode += ".";
-
             Beep(700, 50);
-
             std::cout << currentCode << std::endl;
         }
 
@@ -54,31 +50,24 @@ int main()
         if (tNow && !tPressed)
         {
             currentCode += "-";
-
             Beep(700, 150);
-
             std::cout << currentCode << std::endl;
         }
 
         // SPACEで確定
         if (spaceNow && !spacePressed)
         {
-            std::string result =
-                decoder.Decode(currentCode);
-
-            std::cout
-                << currentCode
-                << " = "
-                << result
-                << std::endl;
-
+            std::string result = decoder.Decode(currentCode);
+            std::cout << currentCode << " = " << result << std::endl;
             currentCode.clear();
         }
 
-            hPressed = hNow;
-            tPressed = tNow;
-            spacePressed = spaceNow;
+        hPressed = hNow;
+        tPressed = tNow;
+        spacePressed = spaceNow;
 
+        
+        //ESCで修了
         if (GetAsyncKeyState(VK_ESCAPE) & 0x8000)
         {
             break;
