@@ -20,10 +20,10 @@ enum class InputMode
     Single
 };
 
-struct HistoryItem
-{
-    string morse;
-    char decoded;
+struct HistoryItem {
+    std::string code;
+    std::string text;
+    HistoryItem(const std::string& c, const std::string& t) : code(c), text(t) {}
 };
 
 int main()
@@ -32,7 +32,7 @@ int main()
     cout << "      CW Trainer\n";
     cout << "=========================\n\n";
 
-    cout << "u : USB Paddle\n";
+ //   cout << "u : USB Paddle\n";
     cout << "p : PC Paddle (H/T)\n";
     cout << "s : Single Key (SPACE)\n\n";
 
@@ -61,10 +61,10 @@ int main()
         return 0;
     }
 
-    int wpm;
+	int wpm;    // Words Per Minute
 
     cout << "WPM (5-40) > ";
-    cin >> wpm;
+    cin >> wpm; 
 
     if (wpm < 5)
         wpm = 5;
@@ -72,10 +72,10 @@ int main()
     if (wpm > 40)
         wpm = 40;
 
-    int ditMs = 1200 / wpm;
-    int thresholdMs = ditMs * 2;
-    int charGapMs = ditMs * 3;
-    int wordGapMs = ditMs * 7;
+	int ditMs = 1200 / wpm; // DITの長さ（ミリ秒）
+	int thresholdMs = ditMs * 2;    // DITとDAHの判定閾値（ミリ秒）
+    int charGapMs = ditMs * 3;    // 文字間隔（ミリ秒）
+    int wordGapMs = ditMs * 9;    // 単語間隔（ミリ秒）
 
     cout << "\n";
     cout << "DIT      : " << ditMs << " ms\n";
@@ -87,54 +87,47 @@ int main()
 
     MorseDecoder decoder;
 
-    string currentMorse;
-    string translatedText;
+	string currentMorse;    //現在入力中のモールス信号格納
+	string translatedText;  //翻訳済み文字列格納
 
-    vector<HistoryItem> history;
+	vector<HistoryItem> history;    //履歴格納
 
-    auto lastInputTime = steady_clock::now();
+	auto lastInputTime = steady_clock::now();   //最後のキー入力時刻
 
-    auto keyDownTime = steady_clock::now();
+	auto keyDownTime = steady_clock::now(); //キー押下時刻
 
-    bool hPressed = false;
-    bool tPressed = false;
-    bool spacePressed = false;
+	bool hPressed = false;  //Hキー押下状態
+	bool tPressed = false;  //Tキー押下状態
+	bool spacePressed = false;  //SPACEキー押下状態
 
-    bool characterDecoded = true;
+    bool characterDecoded = true;   //キー入力受付フラグ
+
+    bool usbDitPressed = false;
+    bool usbDahPressed = false;
 
     auto AddDit = [&]()
         {
-            currentMorse += '.';
-
-            cout << '.';
-            cout.flush();
-
-            Beep(700, ditMs);
-
-            lastInputTime =
-                steady_clock::now();
-
-            characterDecoded = false;
+			currentMorse += '.';    //モールス信号にDIT追加
+			cout << '.';    // 画面に表示
+			cout.flush();   // 画面に表示
+			Beep(700, ditMs);   // DIT音を鳴らす
+			lastInputTime = steady_clock::now();    //最後のキー入力時刻更新
+			characterDecoded = false;   //キー入力受付フラグOFF
         };
 
     auto AddDah = [&]()
         {
             currentMorse += '-';
-
             cout << '-';
             cout.flush();
-
             Beep(700, ditMs * 3);
-
-            lastInputTime =
-                steady_clock::now();
-
+            lastInputTime = steady_clock::now();
             characterDecoded = false;
         };
 
     while (true)
     {
-        if (GetAsyncKeyState(VK_ESCAPE) & 0x8000)
+		if (GetAsyncKeyState(VK_ESCAPE) & 0x8000)   // ESCキー押下で終了
         {
             break;
         }
@@ -146,7 +139,6 @@ int main()
         if (mode == InputMode::Paddle)
         {
             bool hNow = (GetAsyncKeyState('H') & 0x8000) != 0;
-
             bool tNow = (GetAsyncKeyState('T') & 0x8000) != 0;
 
             if (hNow && !hPressed)
@@ -159,7 +151,7 @@ int main()
                 AddDah();
             }
 
-            hPressed = hNow;
+			hPressed = hNow;    // Hキー押下状態更新
             tPressed = tNow;
         }
 
@@ -173,15 +165,13 @@ int main()
 
             if (spaceNow && !spacePressed)
             {
-                keyDownTime = steady_clock::now();
-
-                spacePressed = true;
+				keyDownTime = steady_clock::now();  // キー押下時刻記録
+				spacePressed = true;    // SPACEキー押下状態更新
             }
 
             if (!spaceNow && spacePressed)
             {
-                auto pressTime =
-                    duration_cast<milliseconds>(steady_clock::now() - keyDownTime).count();
+				auto pressTime = duration_cast<milliseconds>(steady_clock::now() - keyDownTime).count();    // キー押下時間計測
 
                 if (pressTime < thresholdMs)
                 {
@@ -202,54 +192,77 @@ int main()
 
         if (mode == InputMode::USB)
         {
-            // 将来Arduino接続時に実装
+            bool ditNow = (GetAsyncKeyState(VK_LCONTROL) & 0x8000) != 0;
+            bool dahNow = (GetAsyncKeyState('A') & 0x8000) != 0;
+
+            if (ditNow && !usbDitPressed)
+            {
+                cout << "[DIT]";
+                AddDit();
+            }
+
+            if (dahNow && !usbDahPressed)
+            {
+                cout << "[DAH]";
+                AddDah();
+            }
+
+            usbDitPressed = ditNow;
+            usbDahPressed = dahNow;
         }
 
-        auto now =
-            steady_clock::now();
 
-        auto idleMs =
-            duration_cast<milliseconds>(
-                now - lastInputTime)
-            .count();
+		auto now = steady_clock::now(); // 現在時刻取得
+
+		auto idleMs = duration_cast<milliseconds>(now - lastInputTime).count(); // 最後のキー入力からの経過時間（ミリ秒）
 
         //-----------------------------------
         // 文字確定
         //-----------------------------------
 
-        if (!characterDecoded &&
-            !currentMorse.empty() &&
-            idleMs >= charGapMs)
+		if (!characterDecoded &&        // 文字確定前
+			!currentMorse.empty() &&    // モールス信号が入力されている
+			idleMs >= charGapMs)        // 一定時間入力がなければ文字確定
         {
-            std::string tmp = decoder.Decode(currentMorse);
-            char result = tmp.empty() ? '\0' : tmp[0];
-
-            translatedText += result;
-
-            history.push_back({ currentMorse, result });
-
+			MorseDecoder decoder;
+            std::string result = decoder.Decode(currentMorse); // result を宣言して代入
             cout << " => " << result << "\n";
 
-            cout << "TEXT : " << translatedText << "\n";
+            if (!result.empty())
+            {
+                translatedText += result;
+                // history.push_back({ currentMorse, result });
+                history.emplace_back(currentMorse, result);
+                // history.push_back(HistoryItem{ currentMorse, result });
 
-            currentMorse.clear();
+                cout << " => " << result << "\n";
+            }
+            else
+            {
+                cout << " => ?\n";
+            }
 
-            characterDecoded = true;
+            translatedText += result;                       //文字確定
+			history.push_back({ currentMorse, result });    //履歴に追加
+			cout << " => " << result << "\n";               //変換結果を画面に表示
+//			cout << "CHAR : " << translatedText << "\n";    //翻訳済み文字列を画面に表示
+            currentMorse.clear();                           //入力文字クリア
+			characterDecoded = true;                        //キー入力受付フラグON
         }
 
         //-----------------------------------
         // 単語区切り
         //-----------------------------------
 
-        if (characterDecoded &&
-            idleMs >= wordGapMs)
+		if (characterDecoded &&         // 文字確定済み
+			idleMs >= wordGapMs)       // 一定時間入力がなければ単語区切り
         {
             if (!translatedText.empty() &&
                 translatedText.back() != ' ')
             {
-                translatedText += ' ';
+                translatedText += ' ';  //単語確定
 
-                cout << "TEXT : " << translatedText << "\n";
+				cout << "WORD : " << translatedText << "\n";    //翻訳済み文字列を画面に表示
             }
 
             lastInputTime = steady_clock::now();
@@ -259,14 +272,17 @@ int main()
     }
 
     cout << "\n\n========== RESULT ==========\n";
-    cout << translatedText << "\n";
+	cout << translatedText << "\n"; //翻訳済み文字列を画面に表示
 
+#if 0
     cout << "\n========== HISTORY =========\n";
 
     for (size_t i = 0; i < history.size(); ++i)
     {
         cout << setw(3) << i + 1 << " : " << setw(6) << history[i].morse << " -> " << history[i].decoded << "\n";
     }
+#endif
+    cout << "\n=============================\n";
 
     return 0;
 }
