@@ -7,6 +7,9 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
+#include <cmath>
+
+#include <portaudio.h>
 
 #include "MorseDecoder.h"
 
@@ -17,7 +20,8 @@ enum class InputMode
 {
     USB,
     Paddle,
-    Single
+    Single,
+    Mic
 };
 
 struct HistoryItem {
@@ -26,15 +30,53 @@ struct HistoryItem {
     HistoryItem(const std::string& c, const std::string& t) : code(c), text(t) {}
 };
 
+double Goertzel(const float* samples,
+    int sampleCount,
+    int sampleRate,
+    double targetFreq)
+{
+    int k =
+        static_cast<int>(
+            0.5 +
+            ((sampleCount * targetFreq) /
+                sampleRate));
+
+    double omega =
+        (2.0 * 3.141592653589793 * k) /
+        sampleCount;
+
+    double coeff = 2.0 * cos(omega);
+
+    double q0 = 0.0;
+    double q1 = 0.0;
+    double q2 = 0.0;
+
+    for (int i = 0; i < sampleCount; ++i)
+    {
+        q0 = coeff * q1 - q2 + samples[i];
+        q2 = q1;
+        q1 = q0;
+    }
+
+    double power =
+        q1 * q1 +
+        q2 * q2 -
+        coeff * q1 * q2;
+
+    return power;
+};
+
+
 int main()
 {
     cout << "=========================\n";
     cout << "      CW Trainer\n";
     cout << "=========================\n\n";
 
- //   cout << "u : USB Paddle\n";
+    cout << "u : USB Paddle\n";
     cout << "p : PC Paddle (H/T)\n";
-    cout << "s : Single Key (SPACE)\n\n";
+    cout << "s : Single Key (SPACE)\n";
+    cout << "m : input MIC\n\n";
 
     cout << "Select > ";
 
@@ -55,6 +97,10 @@ int main()
 
     case 's':
         mode = InputMode::Single;
+        break;
+
+    case 'm':
+        mode = InputMode::Mic;
         break;
 
     default:
@@ -83,6 +129,8 @@ int main()
     cout << "CHAR GAP : " << charGapMs << " ms\n";
     cout << "WORD GAP : " << wordGapMs << " ms\n\n";
 
+    cout << "C = Clear\n\n";
+
     cout << "ESC = Exit\n\n";
 
     MorseDecoder decoder;
@@ -105,6 +153,101 @@ int main()
     bool usbDitPressed = false;
     bool usbDahPressed = false;
 
+    constexpr int SAMPLE_RATE = 8000;
+    constexpr int FRAME_SIZE = 256;
+    constexpr double TARGET_FREQ = 700.0;
+
+    bool deletePressed = false;
+
+    int micDevice = -1;
+    PaStream* stream = nullptr;
+
+    bool micTone = false;
+    bool micTonePrev = false;
+
+    auto micToneStart = steady_clock::now();
+    auto micToneEnd = steady_clock::now();
+
+    float micBuffer[FRAME_SIZE];
+
+    if (mode == InputMode::Mic)
+    {
+
+
+        PaError err = Pa_Initialize();
+
+        if (err != paNoError)
+        {
+            cout << "PortAudio initialize failed.\n";
+            return -1;
+        }
+
+        cout << "\n=== Input Devices ===\n";
+
+        int deviceCount = Pa_GetDeviceCount();
+
+        for (int i = 0; i < deviceCount; i++)
+        {
+            const PaDeviceInfo* info = Pa_GetDeviceInfo(i);
+
+            if (info->maxInputChannels > 0)
+            {
+                cout
+                    << i
+                    << " : "
+                    << info->name
+                    << "\n";
+            }
+        }
+
+        cout << "\nDevice Number > ";
+        cin >> micDevice;
+
+        if (micDevice < 0 || micDevice >= deviceCount)
+        {
+            cout << "Invalid device.\n";
+            return -1;
+        }
+
+        PaStreamParameters inputParams;
+
+        inputParams.device = micDevice;
+        inputParams.channelCount = 1;
+        inputParams.sampleFormat = paFloat32;
+        inputParams.suggestedLatency =
+            Pa_GetDeviceInfo(micDevice)->defaultLowInputLatency;
+        inputParams.hostApiSpecificStreamInfo = nullptr;
+
+        err = Pa_OpenStream(
+            &stream,
+            &inputParams,
+            nullptr,
+            SAMPLE_RATE,
+            FRAME_SIZE,
+            paNoFlag,
+            nullptr,
+            nullptr);
+
+        if (err != paNoError)
+        {
+            cout << "Pa_OpenStream failed.\n";
+            return -1;
+        }
+
+        err = Pa_StartStream(stream);
+
+        if (err != paNoError)
+        {
+            cout << "Pa_StartStream failed.\n";
+            return -1;
+        }
+
+        cout << "\nMIC monitoring start...\n";
+    }
+   
+
+
+
     auto AddDit = [&]()
         {
 			currentMorse += '.';    //モールス信号にDIT追加
@@ -125,12 +268,39 @@ int main()
             characterDecoded = false;
         };
 
+
+
+
+
+
     while (true)
     {
-		if (GetAsyncKeyState(VK_ESCAPE) & 0x8000)   // ESCキー押下で終了
+        //-----------------------------------
+        // ESCキーで終了
+        //-----------------------------------
+    	if (GetAsyncKeyState(VK_ESCAPE) & 0x8000)   // ESCキー押下で終了
         {
             break;
         }
+
+        //-----------------------------------
+        // DELETEキーでWORDバッファクリア
+        //-----------------------------------
+
+        bool deleteNow =
+            (GetAsyncKeyState(VK_DELETE) & 0x8000) != 0;
+
+        if (deleteNow && !deletePressed)
+        {
+            translatedText.clear();
+
+            cout << "\n*** WORD BUFFER CLEARED ***\n";
+            cout << "CHAR : " << translatedText << "\n";
+        }
+
+        deletePressed = deleteNow;
+
+
 
         //-----------------------------------
         // Pモード
@@ -211,6 +381,73 @@ int main()
             usbDahPressed = dahNow;
         }
 
+        //-----------------------------------
+        // Mic入力モード
+        //-----------------------------------
+
+        if (mode == InputMode::Mic)
+        {
+            PaError err =
+                Pa_ReadStream(
+                    stream,
+                    micBuffer,
+                    FRAME_SIZE);
+
+            if (err == paNoError)
+            {
+                double power =
+                    Goertzel(
+                        micBuffer,
+                        FRAME_SIZE,
+                        SAMPLE_RATE,
+                        TARGET_FREQ);
+
+                const double threshold = 100.0;
+
+                micTone = (power > threshold);
+
+                cout << "\r700Hz Power="
+                    << fixed
+                    << setprecision(0)
+                    << power
+                    << "     ";
+
+                if (micTone && !micTonePrev)
+                {
+                    micToneStart =
+                        steady_clock::now();
+                }
+
+                if (!micTone && micTonePrev)
+                {
+                    micToneEnd =
+                        steady_clock::now();
+
+                    auto toneMs =
+                        duration_cast<milliseconds>(
+                            micToneEnd -
+                            micToneStart)
+                        .count();
+
+                    cout << "\nTone "
+                        << toneMs
+                        << " ms ";
+
+                    if (toneMs < thresholdMs)
+                    {
+                        AddDit();
+                    }
+                    else
+                    {
+                        AddDah();
+                    }
+                }
+
+                micTonePrev = micTone;
+            }
+        }
+        
+
 
 		auto now = steady_clock::now(); // 現在時刻取得
 
@@ -226,7 +463,6 @@ int main()
         {
 			MorseDecoder decoder;
             std::string result = decoder.Decode(currentMorse); // result を宣言して代入
-            cout << " => " << result << "\n";
 
             if (!result.empty())
             {
@@ -242,10 +478,6 @@ int main()
                 cout << " => ?\n";
             }
 
-            translatedText += result;                       //文字確定
-			history.push_back({ currentMorse, result });    //履歴に追加
-			cout << " => " << result << "\n";               //変換結果を画面に表示
-//			cout << "CHAR : " << translatedText << "\n";    //翻訳済み文字列を画面に表示
             currentMorse.clear();                           //入力文字クリア
 			characterDecoded = true;                        //キー入力受付フラグON
         }
@@ -283,6 +515,17 @@ int main()
     }
 #endif
     cout << "\n=============================\n";
+
+    if (stream)
+    {
+        Pa_StopStream(stream);
+        Pa_CloseStream(stream);
+    }
+
+    if (mode == InputMode::Mic)
+    {
+        Pa_Terminate();
+    }
 
     return 0;
 }
