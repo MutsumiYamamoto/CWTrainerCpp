@@ -73,10 +73,11 @@ int main()
     cout << "      CW Trainer\n";
     cout << "=========================\n\n";
 
-    cout << "u : *USB Paddle\n";
+//モードの選択
+ //   cout << "u : *USB Paddle\n";
     cout << "p : PC Paddle (H/T)\n";
     cout << "s : Single Key (SPACE)\n";
-    cout << "m : *input MIC\n\n";
+ //   cout << "m : *input MIC\n\n";
 
     cout << "Select > ";
 
@@ -133,9 +134,15 @@ int main()
     cout << "CHAR GAP : " << charGapMs << " ms\n";
     cout << "WORD GAP : " << wordGapMs << " ms\n\n";
 
-    cout << "C = Clear\n\n";
+    cout << "TAB = Disp\n\n";
+
+    cout << "DELETE = Clear\n\n";
 
     cout << "ESC = Exit\n\n";
+
+    cout << "\n\n========== My call signe ==========\n";
+    cout << "\n JL1IRF(.---/.-../.----/../.-./..-.)\n";
+    cout << "\n=====================================\n";
 
     MorseDecoder decoder;
 
@@ -144,25 +151,32 @@ int main()
 
 	vector<HistoryItem> history;    //履歴格納
 
-	auto lastInputTime = steady_clock::now();   //最後のキー入力時刻
-
+    //検出パラメータ
+    constexpr int SAMPLE_RATE = 8000;   // サンプリング周波数
+    constexpr int FRAME_SIZE = 256;     // フレームサイズ
+    constexpr double TARGET_FREQ = 700.0;   // 700Hzの周波数
+    
+    auto lastInputTime = steady_clock::now();   //最後のキー入力時刻
 	auto keyDownTime = steady_clock::now(); //キー押下時刻
+    bool characterDecoded = true;   //キー入力受付フラグ
 
+    //モールス入力キー
 	bool hPressed = false;  //Hキー押下状態
 	bool tPressed = false;  //Tキー押下状態
-	bool spacePressed = false;  //SPACEキー押下状態
 
-    bool characterDecoded = true;   //キー入力受付フラグ
+	bool spacePressed = false;  //SPACEキー押下状態
 
 	bool usbDitPressed = false; //USB DITキー押下状態
 	bool usbDahPressed = false; //USB DAHキー押下状態
 
-	constexpr int SAMPLE_RATE = 8000;   // サンプリング周波数
-	constexpr int FRAME_SIZE = 256;     // フレームサイズ
-	constexpr double TARGET_FREQ = 700.0;   // 700Hzの周波数
+    //キーによる機能
+    bool deletePressed = false; // DELETEキー押下状態
+    bool tabPressed = false; // TABキー押下状態
 
-	bool deletePressed = false; // DELETEキー押下状態
 
+
+
+    //マイク入力関連
 	int micDevice = -1; // マイクデバイス番号
 	PaStream* stream = nullptr; // PortAudioストリーム
 
@@ -249,7 +263,7 @@ int main()
    
 
 
-
+    //短音入力時の処理
     auto AddDit = [&]()
         {
 			currentMorse += '.';    //モールス信号にDIT追加
@@ -260,6 +274,7 @@ int main()
 			characterDecoded = false;   //キー入力受付フラグOFF
         };
 
+    //長音入力の処理
     auto AddDah = [&]()
         {
             currentMorse += '-';
@@ -297,13 +312,31 @@ int main()
             translatedText.clear();
 
             cout << "\n*** WORD BUFFER CLEARED ***\n";
-            cout << "CHAR : " << translatedText << "\n";
+            cout << "CHAR : " << translatedText << "\n\n";
+            cout << "\n\n========== My call signe ==========\n";
+            cout << "\n JL1IRF(.---/.-../.----/../.-./..-.)\n";
+            cout << "\n=====================================\n";
         }
 
         deletePressed = deleteNow;
 
+        //-----------------------------------
+        // TABキーでWORDバッファ表示
+        //-----------------------------------
 
+        bool dispNow =
+            (GetAsyncKeyState(VK_TAB) & 0x8000) != 0;
 
+        if (dispNow && !tabPressed) //TABキーの状態が!falseなら
+        {
+            cout << "\n*** WORD BUFFER NOW ***\n";
+            cout << "CHAR : " << translatedText << "\n\n"; //翻訳済み文字列を画面に表示
+            cout << "\n\n========== My call signe ==========\n";
+            cout << "\n JL1IRF(.---/.-../.----/../.-./..-.)\n";
+            cout << "\n=====================================\n";
+        }
+
+        tabPressed = dispNow;   //次のループではここに入らない
 
         //-----------------------------------
         // Pモード
