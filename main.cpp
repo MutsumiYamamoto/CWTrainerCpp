@@ -73,10 +73,10 @@ int main()
     cout << "      CW Trainer\n";
     cout << "=========================\n\n";
 
-    cout << "u : USB Paddle\n";
+    cout << "u : *USB Paddle\n";
     cout << "p : PC Paddle (H/T)\n";
     cout << "s : Single Key (SPACE)\n";
-    cout << "m : input MIC\n\n";
+    cout << "m : *input MIC\n\n";
 
     cout << "Select > ";
 
@@ -109,6 +109,7 @@ int main()
 
 	int wpm;    // Words Per Minute
 
+#if 0
     cout << "WPM (5-40) > ";
     cin >> wpm; 
 
@@ -117,6 +118,9 @@ int main()
 
     if (wpm > 40)
         wpm = 40;
+#else
+    wpm = 20;
+#endif
 
 	int ditMs = 1200 / wpm; // DITの長さ（ミリ秒）
 	int thresholdMs = ditMs * 2;    // DITとDAHの判定閾値（ミリ秒）
@@ -150,30 +154,28 @@ int main()
 
     bool characterDecoded = true;   //キー入力受付フラグ
 
-    bool usbDitPressed = false;
-    bool usbDahPressed = false;
+	bool usbDitPressed = false; //USB DITキー押下状態
+	bool usbDahPressed = false; //USB DAHキー押下状態
 
-    constexpr int SAMPLE_RATE = 8000;
-    constexpr int FRAME_SIZE = 256;
-    constexpr double TARGET_FREQ = 700.0;
+	constexpr int SAMPLE_RATE = 8000;   // サンプリング周波数
+	constexpr int FRAME_SIZE = 256;     // フレームサイズ
+	constexpr double TARGET_FREQ = 700.0;   // 700Hzの周波数
 
-    bool deletePressed = false;
+	bool deletePressed = false; // DELETEキー押下状態
 
-    int micDevice = -1;
-    PaStream* stream = nullptr;
+	int micDevice = -1; // マイクデバイス番号
+	PaStream* stream = nullptr; // PortAudioストリーム
 
-    bool micTone = false;
-    bool micTonePrev = false;
+	bool micTone = false;   // マイク入力の700Hzトーン検出状態
+	bool micTonePrev = false;   // マイク入力の700Hzトーン検出状態（前回）
 
-    auto micToneStart = steady_clock::now();
-    auto micToneEnd = steady_clock::now();
+	auto micToneStart = steady_clock::now();    // マイク入力の700Hzトーン検出開始時刻
+	auto micToneEnd = steady_clock::now();      // マイク入力の700Hzトーン検出終了時刻
 
-    float micBuffer[FRAME_SIZE];
+	float micBuffer[FRAME_SIZE];    // マイク入力バッファ
 
     if (mode == InputMode::Mic)
     {
-
-
         PaError err = Pa_Initialize();
 
         if (err != paNoError)
@@ -299,6 +301,7 @@ int main()
         }
 
         deletePressed = deleteNow;
+
 
 
 
@@ -447,7 +450,7 @@ int main()
             }
         }
         
-
+        
 
 		auto now = steady_clock::now(); // 現在時刻取得
 
@@ -505,15 +508,6 @@ int main()
 
     cout << "\n\n========== RESULT ==========\n";
 	cout << translatedText << "\n"; //翻訳済み文字列を画面に表示
-
-#if 0
-    cout << "\n========== HISTORY =========\n";
-
-    for (size_t i = 0; i < history.size(); ++i)
-    {
-        cout << setw(3) << i + 1 << " : " << setw(6) << history[i].morse << " -> " << history[i].decoded << "\n";
-    }
-#endif
     cout << "\n=============================\n";
 
     if (stream)
