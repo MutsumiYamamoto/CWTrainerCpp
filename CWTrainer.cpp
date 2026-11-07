@@ -13,6 +13,7 @@
 #include <portaudio.h>
 
 #include "MorseDecoder.h"
+#include "SingleInput.h"
 
 
 using namespace std;
@@ -69,9 +70,16 @@ CWTrainer::CWTrainer()
         steady_clock::now();
 
     characterDecoded = true;
+
+    singleInput =
+        new SingleInput(
+            thresholdMs);
 }
 
-
+CWTrainer::~CWTrainer()
+{
+    delete singleInput;
+}
 
 int CWTrainer::Run()
 {
@@ -317,11 +325,11 @@ int CWTrainer::Run()
         {
             translatedText.clear();
 
-            cout << "\n*** WORD BUFFER CLEARED ***\n";
-            cout << "CHAR : " << translatedText << "\n\n";
-            cout << "\n\n========== My call signe ==========\n";
+            cout << "\n========== WORD BUFFER CLEARED ==========\n";
+            cout << "CHAR : " << translatedText << "\n";
+            cout << "\n***** My call signe *********************\n";
             cout << "\n JL1IRF(.---/.-../.----/../.-./..-.)\n";
-            cout << "\n=====================================\n";
+            cout << "\n*****************************************\n";
         }
 
         deletePressed = deleteNow;
@@ -335,11 +343,11 @@ int CWTrainer::Run()
 
         if (dispNow && !tabPressed) //TABキーの状態が!falseなら
         {
-            cout << "\n*** WORD BUFFER NOW ***\n";
-            cout << "CHAR : " << translatedText << "\n\n"; //翻訳済み文字列を画面に表示
-            cout << "\n\n========== My call signe ==========\n";
+            cout << "\n========== WORD BUFFER NOW ==============\n";
+            cout << "CHAR : " << translatedText << "\n"; //翻訳済み文字列を画面に表示
+            cout << "\n***** My call signe *********************\n";
             cout << "\n JL1IRF(.---/.-../.----/../.-./..-.)\n";
-            cout << "\n=====================================\n";
+            cout << "\n*****************************************\n";
         }
 
         tabPressed = dispNow;   //次のループではここに入らない
@@ -373,28 +381,26 @@ int CWTrainer::Run()
 
         if (mode == InputMode::Single)
         {
-            bool spaceNow = (GetAsyncKeyState(VK_SPACE) & 0x8000) != 0;
+            auto result =
+                singleInput->Poll();
 
-            if (spaceNow && !spacePressed)
+            switch (result)
             {
-                keyDownTime = steady_clock::now();  // キー押下時刻記録
-                spacePressed = true;    // SPACEキー押下状態更新
-            }
+            case MorseElement::Dit:
 
-            if (!spaceNow && spacePressed)
-            {
-                auto pressTime = duration_cast<milliseconds>(steady_clock::now() - keyDownTime).count();    // キー押下時間計測
+                AddDit();
 
-                if (pressTime < thresholdMs)
-                {
-                    AddDit();
-                }
-                else
-                {
-                    AddDah();
-                }
+                break;
 
-                spacePressed = false;
+            case MorseElement::Dah:
+
+                AddDah();
+
+                break;
+
+            default:
+
+                break;
             }
         }
 

@@ -5,6 +5,7 @@
 #include <chrono>
 
 #include "MorseDecoder.h"
+#include "SingleInput.h"
 
 struct HistoryItem
 {
@@ -35,6 +36,7 @@ class CWTrainer
 public:
 
     CWTrainer();
+    ~CWTrainer();
 
     int Run();
 
@@ -63,4 +65,6 @@ private:
         lastInputTime;
 
     bool characterDecoded;
+
+    SingleInput* singleInput; // ← 追加: SingleInput型のポインタをメンバーとして宣言
 };
