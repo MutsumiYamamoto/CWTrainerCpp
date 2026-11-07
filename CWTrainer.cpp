@@ -194,33 +194,10 @@ int CWTrainer::Run()
     auto keyDownTime = steady_clock::now(); //キー押下時刻
     bool characterDecoded = true;   //キー入力受付フラグ
 
-    //モールス入力キー
-    bool hPressed = false;  //Hキー押下状態
-    bool tPressed = false;  //Tキー押下状態
-
-    bool spacePressed = false;  //SPACEキー押下状態
-
-    bool usbDitPressed = false; //USB DITキー押下状態
-    bool usbDahPressed = false; //USB DAHキー押下状態
-
     //キーによる機能
     bool deletePressed = false; // DELETEキー押下状態
     bool tabPressed = false; // TABキー押下状態
 
-
-
-
-    //マイク入力関連
-//    int micDevice = -1; // マイクデバイス番号
-//    PaStream* stream = nullptr; // PortAudioストリーム
-
-//    bool micTone = false;   // マイク入力の700Hzトーン検出状態
-//    bool micTonePrev = false;   // マイク入力の700Hzトーン検出状態（前回）
-
-//    auto micToneStart = steady_clock::now();    // マイク入力の700Hzトーン検出開始時刻
-//    auto micToneEnd = steady_clock::now();      // マイク入力の700Hzトーン検出終了時刻
-
-//    float micBuffer[FRAME_SIZE];    // マイク入力バッファ
 
     if (mode == InputMode::Mic)
     {
