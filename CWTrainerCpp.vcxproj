@@ -144,6 +144,7 @@
     <ClCompile Include="MorseDecoder.cpp" />
     <ClCompile Include="PaddleInput.cpp" />
     <ClCompile Include="SingleInput.cpp" />
+    <ClCompile Include="UsbInput.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CWTrainer.h" />
@@ -151,6 +152,7 @@
     <ClInclude Include="MorseElement.h" />
     <ClInclude Include="PaddleInput.h" />
     <ClInclude Include="SingleInput.h" />
+    <ClInclude Include="UsbInput.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ClassDiagram.cd" />

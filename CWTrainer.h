@@ -7,6 +7,7 @@
 #include "MorseDecoder.h"
 #include "SingleInput.h"
 #include "PaddleInput.h"
+#include "UsbInput.h"
 
 struct HistoryItem
 {
@@ -70,4 +71,6 @@ private:
     SingleInput* singleInput; // ← 追加: SingleInput型のポインタをメンバーとして宣言
 
     PaddleInput* paddleInput;
+
+    UsbInput* usbInput;
 };

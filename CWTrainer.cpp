@@ -77,6 +77,10 @@ CWTrainer::CWTrainer()
 
     paddleInput =
         new PaddleInput();
+
+    usbInput =
+        new UsbInput();
+
 }
 
 CWTrainer::~CWTrainer()
@@ -84,6 +88,8 @@ CWTrainer::~CWTrainer()
     delete singleInput;
 
     delete paddleInput;
+
+    delete usbInput;
 }
 
 int CWTrainer::Run()
@@ -421,23 +427,31 @@ int CWTrainer::Run()
 
         if (mode == InputMode::USB)
         {
-            bool ditNow = (GetAsyncKeyState(VK_LCONTROL) & 0x8000) != 0;
-            bool dahNow = (GetAsyncKeyState('A') & 0x8000) != 0;
+            auto result =
+                usbInput->Poll();
 
-            if (ditNow && !usbDitPressed)
+            switch (result)
             {
+            case MorseElement::Dit:
+
                 cout << "[DIT]";
+
                 AddDit();
-            }
 
-            if (dahNow && !usbDahPressed)
-            {
+                break;
+
+            case MorseElement::Dah:
+
                 cout << "[DAH]";
-                AddDah();
-            }
 
-            usbDitPressed = ditNow;
-            usbDahPressed = dahNow;
+                AddDah();
+
+                break;
+
+            default:
+
+                break;
+            }
         }
 
         //-----------------------------------
