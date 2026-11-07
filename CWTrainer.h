@@ -6,6 +6,7 @@
 
 #include "MorseDecoder.h"
 #include "SingleInput.h"
+#include "PaddleInput.h"
 
 struct HistoryItem
 {
@@ -67,4 +68,6 @@ private:
     bool characterDecoded;
 
     SingleInput* singleInput; // ← 追加: SingleInput型のポインタをメンバーとして宣言
+
+    PaddleInput* paddleInput;
 };

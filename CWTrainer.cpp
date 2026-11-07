@@ -74,11 +74,16 @@ CWTrainer::CWTrainer()
     singleInput =
         new SingleInput(
             thresholdMs);
+
+    paddleInput =
+        new PaddleInput();
 }
 
 CWTrainer::~CWTrainer()
 {
     delete singleInput;
+
+    delete paddleInput;
 }
 
 int CWTrainer::Run()
@@ -358,21 +363,27 @@ int CWTrainer::Run()
 
         if (mode == InputMode::Paddle)
         {
-            bool hNow = (GetAsyncKeyState('H') & 0x8000) != 0;
-            bool tNow = (GetAsyncKeyState('T') & 0x8000) != 0;
+            auto result =
+                paddleInput->Poll();
 
-            if (hNow && !hPressed)
+            switch (result)
             {
+            case MorseElement::Dit:
+
                 AddDit();
-            }
 
-            if (tNow && !tPressed)
-            {
+                break;
+
+            case MorseElement::Dah:
+
                 AddDah();
-            }
 
-            hPressed = hNow;    // Hキー押下状態更新
-            tPressed = tNow;
+                break;
+
+            default:
+
+                break;
+            }
         }
 
         //-----------------------------------
