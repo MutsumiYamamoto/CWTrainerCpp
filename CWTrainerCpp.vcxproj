@@ -139,13 +139,13 @@
     </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="CWTrainer.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MorseDecoder.cpp" />
-    <ClCompile Include="SerialPort.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CWTrainer.h" />
     <ClInclude Include="MorseDecoder.h" />
-    <ClInclude Include="SerialPort.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ClassDiagram.cd" />
