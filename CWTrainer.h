@@ -8,6 +8,7 @@
 #include "SingleInput.h"
 #include "PaddleInput.h"
 #include "UsbInput.h"
+#include "MicInput.h"
 
 struct HistoryItem
 {
@@ -73,4 +74,7 @@ private:
     PaddleInput* paddleInput;
 
     UsbInput* usbInput;
+
+    MicInput* micInput;
+
 };

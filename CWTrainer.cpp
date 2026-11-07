@@ -81,6 +81,10 @@ CWTrainer::CWTrainer()
     usbInput =
         new UsbInput();
 
+    micInput =
+        new MicInput(
+            thresholdMs);
+
 }
 
 CWTrainer::~CWTrainer()
@@ -90,6 +94,8 @@ CWTrainer::~CWTrainer()
     delete paddleInput;
 
     delete usbInput;
+
+    delete micInput;
 }
 
 int CWTrainer::Run()
@@ -132,6 +138,9 @@ int CWTrainer::Run()
     default:
         return 0;
     }
+
+
+
 
     int wpm;    // Words Per Minute
 
@@ -202,88 +211,23 @@ int CWTrainer::Run()
 
 
     //マイク入力関連
-    int micDevice = -1; // マイクデバイス番号
-    PaStream* stream = nullptr; // PortAudioストリーム
+//    int micDevice = -1; // マイクデバイス番号
+//    PaStream* stream = nullptr; // PortAudioストリーム
 
-    bool micTone = false;   // マイク入力の700Hzトーン検出状態
-    bool micTonePrev = false;   // マイク入力の700Hzトーン検出状態（前回）
+//    bool micTone = false;   // マイク入力の700Hzトーン検出状態
+//    bool micTonePrev = false;   // マイク入力の700Hzトーン検出状態（前回）
 
-    auto micToneStart = steady_clock::now();    // マイク入力の700Hzトーン検出開始時刻
-    auto micToneEnd = steady_clock::now();      // マイク入力の700Hzトーン検出終了時刻
+//    auto micToneStart = steady_clock::now();    // マイク入力の700Hzトーン検出開始時刻
+//    auto micToneEnd = steady_clock::now();      // マイク入力の700Hzトーン検出終了時刻
 
-    float micBuffer[FRAME_SIZE];    // マイク入力バッファ
+//    float micBuffer[FRAME_SIZE];    // マイク入力バッファ
 
     if (mode == InputMode::Mic)
     {
-        PaError err = Pa_Initialize();
-
-        if (err != paNoError)
+        if (!micInput->Initialize())
         {
-            cout << "PortAudio initialize failed.\n";
             return -1;
         }
-
-        cout << "\n=== Input Devices ===\n";
-
-        int deviceCount = Pa_GetDeviceCount();
-
-        for (int i = 0; i < deviceCount; i++)
-        {
-            const PaDeviceInfo* info = Pa_GetDeviceInfo(i);
-
-            if (info->maxInputChannels > 0)
-            {
-                cout
-                    << i
-                    << " : "
-                    << info->name
-                    << "\n";
-            }
-        }
-
-        cout << "\nDevice Number > ";
-        cin >> micDevice;
-
-        if (micDevice < 0 || micDevice >= deviceCount)
-        {
-            cout << "Invalid device.\n";
-            return -1;
-        }
-
-        PaStreamParameters inputParams;
-
-        inputParams.device = micDevice;
-        inputParams.channelCount = 1;
-        inputParams.sampleFormat = paFloat32;
-        inputParams.suggestedLatency =
-            Pa_GetDeviceInfo(micDevice)->defaultLowInputLatency;
-        inputParams.hostApiSpecificStreamInfo = nullptr;
-
-        err = Pa_OpenStream(
-            &stream,
-            &inputParams,
-            nullptr,
-            SAMPLE_RATE,
-            FRAME_SIZE,
-            paNoFlag,
-            nullptr,
-            nullptr);
-
-        if (err != paNoError)
-        {
-            cout << "Pa_OpenStream failed.\n";
-            return -1;
-        }
-
-        err = Pa_StartStream(stream);
-
-        if (err != paNoError)
-        {
-            cout << "Pa_StartStream failed.\n";
-            return -1;
-        }
-
-        cout << "\nMIC monitoring start...\n";
     }
 
 
@@ -457,69 +401,30 @@ int CWTrainer::Run()
         //-----------------------------------
         // Mic入力モード
         //-----------------------------------
-#if 0
         if (mode == InputMode::Mic)
         {
-            PaError err =
-                Pa_ReadStream(
-                    stream,
-                    micBuffer,
-                    FRAME_SIZE);
+            auto result =
+                micInput->Poll();
 
-            if (err == paNoError)
+            switch (result)
             {
-                double power =
-                    Goertzel(
-                        micBuffer,
-                        FRAME_SIZE,
-                        SAMPLE_RATE,
-                        TARGET_FREQ);
+            case MorseElement::Dit:
 
-                const double threshold = 100.0;
+                AddDit();
 
-                micTone = (power > threshold);
+                break;
 
-                cout << "\r700Hz Power="
-                    << fixed
-                    << setprecision(0)
-                    << power
-                    << "     ";
+            case MorseElement::Dah:
 
-                if (micTone && !micTonePrev)
-                {
-                    micToneStart =
-                        steady_clock::now();
-                }
+                AddDah();
 
-                if (!micTone && micTonePrev)
-                {
-                    micToneEnd =
-                        steady_clock::now();
+                break;
 
-                    auto toneMs =
-                        duration_cast<milliseconds>(
-                            micToneEnd -
-                            micToneStart)
-                        .count();
+            default:
 
-                    cout << "\nTone "
-                        << toneMs
-                        << " ms ";
-
-                    if (toneMs < thresholdMs)
-                    {
-                        AddDit();
-                    }
-                    else
-                    {
-                        AddDah();
-                    }
-                }
-
-                micTonePrev = micTone;
+                break;
             }
         }
-#endif
 
 
         auto now = steady_clock::now(); // 現在時刻取得
@@ -580,11 +485,11 @@ int CWTrainer::Run()
     cout << translatedText << "\n"; //翻訳済み文字列を画面に表示
     cout << "\n=============================\n";
 
-    if (stream)
-    {
-        Pa_StopStream(stream);
-        Pa_CloseStream(stream);
-    }
+//    if (stream)
+//    {
+//       Pa_StopStream(stream);
+//        Pa_CloseStream(stream);
+//    }
 
     if (mode == InputMode::Mic)
     {
