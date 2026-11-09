@@ -149,6 +149,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CWTrainer.h" />
+    <ClInclude Include="IInputDevice.h" />
     <ClInclude Include="MicInput.h" />
     <ClInclude Include="MorseDecoder.h" />
     <ClInclude Include="MorseElement.h" />

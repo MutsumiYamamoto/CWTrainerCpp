@@ -3,15 +3,16 @@
 #include <chrono>
 
 #include "MorseElement.h"
+#include "IInputDevice.h"
 
-class SingleInput
+class SingleInput : public IInputDevice
 {
 public:
 
     explicit SingleInput(
         int thresholdMs);
 
-    MorseElement Poll();
+	MorseElement Poll() override;
 
 private:
 

@@ -5,8 +5,9 @@
 #include <portaudio.h>
 
 #include "MorseElement.h"
+#include "IInputDevice.h"
 
-class MicInput
+class MicInput : public IInputDevice
 {
 public:
 
@@ -17,7 +18,7 @@ public:
 
     bool Initialize();
 
-    MorseElement Poll();
+	MorseElement Poll() override;
 
 private:
 

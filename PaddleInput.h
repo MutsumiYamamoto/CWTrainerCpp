@@ -1,12 +1,13 @@
 #pragma once
 
 #include "MorseElement.h"
+#include "IInputDevice.h"
 
-class PaddleInput
+class PaddleInput : public IInputDevice
 {
 public:
 
-    MorseElement Poll();
+	MorseElement Poll() override;
 
 private:
 
