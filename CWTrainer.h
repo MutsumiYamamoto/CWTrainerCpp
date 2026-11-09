@@ -10,6 +10,7 @@
 #include "UsbInput.h"
 #include "MicInput.h"
 #include "CommandInput.h"
+#include "DisplayManager.h"
 
 struct HistoryItem
 {
@@ -73,5 +74,7 @@ private:
 	IInputDevice* inputDevice; // ← 追加: IInputDevice型のポインタをメンバーとして宣言
 
 	CommandInput commandInput;
+
+    DisplayManager display;
 
 };

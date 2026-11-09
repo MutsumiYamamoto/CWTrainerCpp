@@ -11,16 +11,13 @@ using namespace std::chrono;
 
 MicInput::MicInput(
     int threshold)
+    : thresholdMs(threshold),
+    micDevice(-1),
+    stream(nullptr),
+    micTone(false),
+    micTonePrev(false),
+    micBuffer{ 0.0f }
 {
-    thresholdMs = threshold;
-
-    micDevice = -1;
-
-    stream = nullptr;
-
-    micTone = false;
-
-    micTonePrev = false;
 }
 
 MicInput::~MicInput()

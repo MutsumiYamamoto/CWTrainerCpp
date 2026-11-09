@@ -11,5 +11,5 @@ public:
     virtual MorseElement Poll() = 0;
 
 private:
-    IInputDevice* inputDevice;
+    IInputDevice* inputDevice = nullptr;
 };

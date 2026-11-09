@@ -141,6 +141,7 @@
   <ItemGroup>
     <ClCompile Include="CommandInput.cpp" />
     <ClCompile Include="CWTrainer.cpp" />
+    <ClCompile Include="DisplayManager.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MicInput.cpp" />
     <ClCompile Include="MorseDecoder.cpp" />
@@ -152,6 +153,7 @@
     <ClInclude Include="CommandAction.h" />
     <ClInclude Include="CommandInput.h" />
     <ClInclude Include="CWTrainer.h" />
+    <ClInclude Include="DisplayManager.h" />
     <ClInclude Include="IInputDevice.h" />
     <ClInclude Include="MicInput.h" />
     <ClInclude Include="MorseDecoder.h" />

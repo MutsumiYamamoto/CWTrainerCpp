@@ -1,0 +1,136 @@
+#include "DisplayManager.h"
+
+#include <windows.h>
+#include <chrono>
+#include <cctype>
+#include <iomanip>
+#include <iostream>
+#include <string>
+#include <unordered_map>
+#include <vector>
+#include <cmath>
+
+void DisplayManager::ShowTitle()
+{
+    std::cout
+        << "=========================\n";
+
+    std::cout
+        << "      CW Trainer\n";
+
+    std::cout
+        << "=========================\n\n";
+}
+void DisplayManager::ShowSelectMode()
+{
+    std::cout
+        << "\n***** SELECT MODE *****\n";
+
+    std::cout << "u : *USB Paddle\n";
+    std::cout << "p : PC Paddle (H/T)\n";
+    std::cout << "s : Single Key (SPACE)\n";
+    std::cout << "m : *input MIC\n\n";
+
+    //    std::cout
+    //        << "\n*****************************************\n";
+}
+
+void DisplayManager::ShowCallSign()
+{
+    std::cout
+        << "\n***** My call signe *****\n";
+
+    std::cout
+        << "JL1IRF(.---/.-../.----/../.-./..-.)\n";
+    std::cout
+        << "\n*****************************************\n";
+}
+
+void DisplayManager::ShowKeyCommands()
+{
+    std::cout
+        << "\n***** KEY COMMANDS *****\n";
+
+    std::cout
+        << "TAB = Disp\n";
+    std::cout
+        << "DELETE = Clear\n";
+    std::cout
+        << "ESC = Exit\n";
+
+//    std::cout
+//        << "\n*****************************************\n";
+}
+
+void DisplayManager::ShowBuffer(
+    const std::string& text)
+{
+    std::cout
+        << "\n========== WORD BUFFER NOW ==============\n";
+
+    std::cout
+        << "CHAR : "
+        << text
+        << "\n";
+}
+
+void DisplayManager::ShowBufferCleared()
+{
+    std::cout
+        << "\n========== WORD BUFFER CLEARED ==========\n";
+
+    std::cout
+        << "CHAR : \n";
+}
+
+void DisplayManager::ShowCharacter(
+    const std::string& result)
+{
+    std::cout
+        << " => "
+        << result
+        << "\n";
+}
+
+void DisplayManager::ShowWord(
+    const std::string& word)
+{
+    std::cout
+        << "WORD : "
+        << word
+        << "\n";
+}
+
+void DisplayManager::ShowResult(
+    const std::string& text)
+{
+    std::cout
+        << "\n\n========== RESULT ==========\n";
+
+    std::cout
+        << text
+        << "\n";
+
+    std::cout
+        << "\n=============================\n";
+}
+
+void DisplayManager::ShowTiming(
+    int ditMs,
+    int thresholdMs,
+    int charGapMs,
+    int wordGapMs)
+{
+    // 既存のプロジェクト標準に従い、タイミング情報を表示
+    std::cout << "Dit: " << ditMs
+        << " ms, Threshold: " << thresholdMs
+        << " ms, Char Gap: " << charGapMs
+        << " ms, Word Gap: " << wordGapMs
+        << " ms" << std::endl;
+}
+
+void DisplayManager::ShowUnknownCharacter()
+{
+    // 未知の文字が入力された場合の表示処理
+    std::cout << "Unknown character detected." << std::endl;
+}

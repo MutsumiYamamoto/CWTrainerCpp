@@ -14,6 +14,9 @@
 
 #include "MorseDecoder.h"
 #include "SingleInput.h"
+#include "IInputDevice.h"
+
+
 
 
 using namespace std;
@@ -52,6 +55,7 @@ void CWTrainer::AddDah()
 }
 
 CWTrainer::CWTrainer()
+    : inputDevice(nullptr) // ここで明示的に初期化
 {
     wpm = 20;
 
@@ -80,17 +84,14 @@ CWTrainer::~CWTrainer()
     delete inputDevice;
 }
 
+
 int CWTrainer::Run()
 {
-    cout << "=========================\n";
-    cout << "      CW Trainer\n";
-    cout << "=========================\n\n";
+    //タイトルの表示
+    display.ShowTitle();
 
-    //モードの選択
-     //   cout << "u : *USB Paddle\n";
-    cout << "p : PC Paddle (H/T)\n";
-    cout << "s : Single Key (SPACE)\n";
-    //   cout << "m : *input MIC\n\n";
+    //モードの表示
+    display.ShowSelectMode();
 
     cout << "Select > ";
 
@@ -99,31 +100,29 @@ int CWTrainer::Run()
 
     InputMode mode;
 
+    MicInput* mic = nullptr; // switch文の前で宣言・初期化
+
+
     switch (tolower(modeChar))
     {
     case 'u':
         mode = InputMode::USB;
+
+        inputDevice =
+            new UsbInput();
+
         break;
 
     case 'p':
         mode = InputMode::Paddle;
+
+        inputDevice =
+            new PaddleInput();
+
         break;
 
     case 's':
         mode = InputMode::Single;
-        break;
-
-    case 'm':
-        mode = InputMode::Mic;
-        break;
-
-    default:
-        return 0;
-    }
-
-    switch (mode)
-    {
-    case InputMode::Single:
 
         inputDevice =
             new SingleInput(
@@ -131,28 +130,30 @@ int CWTrainer::Run()
 
         break;
 
-    case InputMode::Paddle:
-
-        inputDevice =
-            new PaddleInput();
-
-        break;
-
-    case InputMode::USB:
-
-        inputDevice =
-            new UsbInput();
-
-        break;
-
-    case InputMode::Mic:
+    case 'm':
+        mode = InputMode::Mic;
 
         inputDevice =
             new MicInput(
                 thresholdMs);
 
+        mic =
+            dynamic_cast<MicInput*>(
+                inputDevice);
+
+        if (!mic->Initialize())
+        {
+            return -1;
+        }
+
         break;
+
+    default:
+
+        return 0;
     }
+
+
 
     int wpm;    // Words Per Minute
 
@@ -174,21 +175,18 @@ int CWTrainer::Run()
     int charGapMs = ditMs * 3;    // 文字間隔（ミリ秒）
     int wordGapMs = ditMs * 9;    // 単語間隔（ミリ秒）
 
-    cout << "\n";
-    cout << "DIT      : " << ditMs << " ms\n";
-    cout << "THRESHOLD: " << thresholdMs << " ms\n";
-    cout << "CHAR GAP : " << charGapMs << " ms\n";
-    cout << "WORD GAP : " << wordGapMs << " ms\n\n";
 
-    cout << "TAB = Disp\n\n";
+    //タイミング表示
+    display.ShowTiming(
+        ditMs,
+        thresholdMs,
+        charGapMs,
+        wordGapMs);
+    //キーコマンド表示
+    display.ShowKeyCommands();
+    //コールサイン表示
+    display.ShowCallSign();
 
-    cout << "DELETE = Clear\n\n";
-
-    cout << "ESC = Exit\n\n";
-
-    cout << "\n\n========== My call signe ==========\n";
-    cout << "\n JL1IRF(.---/.-../.----/../.-./..-.)\n";
-    cout << "\n=====================================\n";
 
     MorseDecoder decoder;
 
@@ -205,11 +203,6 @@ int CWTrainer::Run()
     auto lastInputTime = steady_clock::now();   //最後のキー入力時刻
     auto keyDownTime = steady_clock::now(); //キー押下時刻
     bool characterDecoded = true;   //キー入力受付フラグ
-
-
-
-
-
 
     //短音入力時の処理
     auto AddDit = [&]()
@@ -256,43 +249,18 @@ int CWTrainer::Run()
 
             translatedText.clear();
 
-            cout
-                << "\n========== WORD BUFFER CLEARED ==========\n";
+            display.ShowBufferCleared();
 
-            cout
-                << "CHAR : "
-                << translatedText
-                << "\n";
-
-            cout
-                << "\n***** My call signe *********************\n";
-
-            cout
-                << "\n JL1IRF(.---/.-../.----/../.-./..-.)\n";
-
-            cout
-                << "\n*****************************************\n";
+            display.ShowCallSign();
 
             break;
 
         case CommandAction::DisplayBuffer:
 
-            cout
-                << "\n========== WORD BUFFER NOW ==============\n";
+            display.ShowBuffer(
+                translatedText);
 
-            cout
-                << "CHAR : "
-                << translatedText
-                << "\n";
-
-            cout
-                << "\n***** My call signe *********************\n";
-
-            cout
-                << "\n JL1IRF(.---/.-../.----/../.-./..-.)\n";
-
-            cout
-                << "\n*****************************************\n";
+            display.ShowCallSign();
 
             break;
 
@@ -302,7 +270,7 @@ int CWTrainer::Run()
         }
 
         //-----------------------------------
-        // 各動作モードを継承
+        // 各動作モード（継承済）での処理
         //-----------------------------------
 
         auto result =
@@ -339,7 +307,8 @@ int CWTrainer::Run()
 
         auto now = steady_clock::now(); // 現在時刻取得
 
-        auto idleMs = duration_cast<milliseconds>(now - lastInputTime).count(); // 最後のキー入力からの経過時間（ミリ秒）
+        auto idleMs = duration_cast<milliseconds>
+            (now - lastInputTime).count(); // 最後のキー入力からの経過時間（ミリ秒）
 
         //-----------------------------------
         // 文字確定
@@ -359,11 +328,12 @@ int CWTrainer::Run()
                 history.emplace_back(currentMorse, result);
                 // history.push_back(HistoryItem{ currentMorse, result });
 
-                cout << " => " << result << "\n";
+                display.ShowCharacter(
+                    result);
             }
             else
             {
-                cout << " => ?\n";
+                display.ShowUnknownCharacter();
             }
 
             currentMorse.clear();                           //入力文字クリア
@@ -382,7 +352,8 @@ int CWTrainer::Run()
             {
                 translatedText += ' ';  //単語確定
 
-                cout << "WORD : " << translatedText << "\n";    //翻訳済み文字列を画面に表示
+                display.ShowWord(
+                    translatedText);    //翻訳済み文字列を画面に表示
             }
 
             lastInputTime = steady_clock::now();
@@ -391,15 +362,9 @@ int CWTrainer::Run()
         Sleep(10);
     }
 
-    cout << "\n\n========== RESULT ==========\n";
-    cout << translatedText << "\n"; //翻訳済み文字列を画面に表示
-    cout << "\n=============================\n";
+    display.ShowResult(
+        translatedText);
 
-//    if (stream)
-//    {
-//       Pa_StopStream(stream);
-//        Pa_CloseStream(stream);
-//    }
 
     if (mode == InputMode::Mic)
     {
