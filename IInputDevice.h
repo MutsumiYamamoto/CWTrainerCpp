@@ -9,4 +9,7 @@ public:
     virtual ~IInputDevice() = default;
 
     virtual MorseElement Poll() = 0;
+
+private:
+    IInputDevice* inputDevice;
 };

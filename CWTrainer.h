@@ -9,6 +9,7 @@
 #include "PaddleInput.h"
 #include "UsbInput.h"
 #include "MicInput.h"
+#include "CommandInput.h"
 
 struct HistoryItem
 {
@@ -69,14 +70,8 @@ private:
 
     bool characterDecoded;
 
-    SingleInput* singleInput; // ← 追加: SingleInput型のポインタをメンバーとして宣言
+	IInputDevice* inputDevice; // ← 追加: IInputDevice型のポインタをメンバーとして宣言
 
-    PaddleInput* paddleInput;
-
-    UsbInput* usbInput;
-
-    MicInput* micInput;
-
-
+	CommandInput commandInput;
 
 };

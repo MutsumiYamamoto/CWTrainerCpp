@@ -71,31 +71,13 @@ CWTrainer::CWTrainer()
 
     characterDecoded = true;
 
-    singleInput =
-        new SingleInput(
-            thresholdMs);
 
-    paddleInput =
-        new PaddleInput();
-
-    usbInput =
-        new UsbInput();
-
-    micInput =
-        new MicInput(
-            thresholdMs);
 
 }
 
 CWTrainer::~CWTrainer()
 {
-    delete singleInput;
-
-    delete paddleInput;
-
-    delete usbInput;
-
-    delete micInput;
+    delete inputDevice;
 }
 
 int CWTrainer::Run()
@@ -139,8 +121,38 @@ int CWTrainer::Run()
         return 0;
     }
 
+    switch (mode)
+    {
+    case InputMode::Single:
 
+        inputDevice =
+            new SingleInput(
+                thresholdMs);
 
+        break;
+
+    case InputMode::Paddle:
+
+        inputDevice =
+            new PaddleInput();
+
+        break;
+
+    case InputMode::USB:
+
+        inputDevice =
+            new UsbInput();
+
+        break;
+
+    case InputMode::Mic:
+
+        inputDevice =
+            new MicInput(
+                thresholdMs);
+
+        break;
+    }
 
     int wpm;    // Words Per Minute
 
@@ -194,18 +206,8 @@ int CWTrainer::Run()
     auto keyDownTime = steady_clock::now(); //キー押下時刻
     bool characterDecoded = true;   //キー入力受付フラグ
 
-    //キーによる機能
-    bool deletePressed = false; // DELETEキー押下状態
-    bool tabPressed = false; // TABキー押下状態
 
 
-    if (mode == InputMode::Mic)
-    {
-        if (!micInput->Initialize())
-        {
-            return -1;
-        }
-    }
 
 
 
@@ -239,170 +241,101 @@ int CWTrainer::Run()
     while (true)
     {
         //-----------------------------------
-        // ESCキーで終了
+        // コマンド入力
         //-----------------------------------
-        if (GetAsyncKeyState(VK_ESCAPE) & 0x8000)   // ESCキー押下で終了
+        auto action =
+            commandInput.Poll();
+
+        switch (action)
         {
+        case CommandAction::Exit:
+
+            return 0;
+
+        case CommandAction::ClearBuffer:
+
+            translatedText.clear();
+
+            cout
+                << "\n========== WORD BUFFER CLEARED ==========\n";
+
+            cout
+                << "CHAR : "
+                << translatedText
+                << "\n";
+
+            cout
+                << "\n***** My call signe *********************\n";
+
+            cout
+                << "\n JL1IRF(.---/.-../.----/../.-./..-.)\n";
+
+            cout
+                << "\n*****************************************\n";
+
+            break;
+
+        case CommandAction::DisplayBuffer:
+
+            cout
+                << "\n========== WORD BUFFER NOW ==============\n";
+
+            cout
+                << "CHAR : "
+                << translatedText
+                << "\n";
+
+            cout
+                << "\n***** My call signe *********************\n";
+
+            cout
+                << "\n JL1IRF(.---/.-../.----/../.-./..-.)\n";
+
+            cout
+                << "\n*****************************************\n";
+
+            break;
+
+        default:
+
             break;
         }
 
         //-----------------------------------
-        // DELETEキーでWORDバッファクリア
+        // 各動作モードを継承
         //-----------------------------------
 
-        bool deleteNow =
-            (GetAsyncKeyState(VK_DELETE) & 0x8000) != 0;
+        auto result =
+            inputDevice->Poll();
 
-        if (deleteNow && !deletePressed)
+        switch (result)
         {
-            translatedText.clear();
+        case MorseElement::Dit:
 
-            cout << "\n========== WORD BUFFER CLEARED ==========\n";
-            cout << "CHAR : " << translatedText << "\n";
-            cout << "\n***** My call signe *********************\n";
-            cout << "\n JL1IRF(.---/.-../.----/../.-./..-.)\n";
-            cout << "\n*****************************************\n";
-        }
-
-        deletePressed = deleteNow;
-
-        //-----------------------------------
-        // TABキーでWORDバッファ表示
-        //-----------------------------------
-
-        bool dispNow =
-            (GetAsyncKeyState(VK_TAB) & 0x8000) != 0;
-
-        if (dispNow && !tabPressed) //TABキーの状態が!falseなら
-        {
-            cout << "\n========== WORD BUFFER NOW ==============\n";
-            cout << "CHAR : " << translatedText << "\n"; //翻訳済み文字列を画面に表示
-            cout << "\n***** My call signe *********************\n";
-            cout << "\n JL1IRF(.---/.-../.----/../.-./..-.)\n";
-            cout << "\n*****************************************\n";
-        }
-
-        tabPressed = dispNow;   //次のループではここに入らない
-
-        //-----------------------------------
-        // Pモード
-        //-----------------------------------
-
-        if (mode == InputMode::Paddle)
-        {
-            auto result =
-                paddleInput->Poll();
-
-            switch (result)
+            if (mode == InputMode::USB)
             {
-            case MorseElement::Dit:
-
-                AddDit();
-
-                break;
-
-            case MorseElement::Dah:
-
-                AddDah();
-
-                break;
-
-            default:
-
-                break;
-            }
-        }
-
-        //-----------------------------------
-        // Sモード
-        //-----------------------------------
-
-        if (mode == InputMode::Single)
-        {
-            auto result =
-                singleInput->Poll();
-
-            switch (result)
-            {
-            case MorseElement::Dit:
-
-                AddDit();
-
-                break;
-
-            case MorseElement::Dah:
-
-                AddDah();
-
-                break;
-
-            default:
-
-                break;
-            }
-        }
-
-        //-----------------------------------
-        // USBモード
-        //-----------------------------------
-
-        if (mode == InputMode::USB)
-        {
-            auto result =
-                usbInput->Poll();
-
-            switch (result)
-            {
-            case MorseElement::Dit:
-
                 cout << "[DIT]";
-
-                AddDit();
-
-                break;
-
-            case MorseElement::Dah:
-
-                cout << "[DAH]";
-
-                AddDah();
-
-                break;
-
-            default:
-
-                break;
             }
-        }
 
-        //-----------------------------------
-        // Mic入力モード
-        //-----------------------------------
-        if (mode == InputMode::Mic)
-        {
-            auto result =
-                micInput->Poll();
+            AddDit();
 
-            switch (result)
+            break;
+
+        case MorseElement::Dah:
+
+            if (mode == InputMode::USB)
             {
-            case MorseElement::Dit:
-
-                AddDit();
-
-                break;
-
-            case MorseElement::Dah:
-
-                AddDah();
-
-                break;
-
-            default:
-
-                break;
+                cout << "[DAH]";
             }
-        }
 
+            AddDah();
+
+            break;
+
+        default:
+
+            break;
+        }
 
         auto now = steady_clock::now(); // 現在時刻取得
 

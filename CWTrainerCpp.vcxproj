@@ -139,6 +139,7 @@
     </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="CommandInput.cpp" />
     <ClCompile Include="CWTrainer.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MicInput.cpp" />
@@ -148,6 +149,8 @@
     <ClCompile Include="UsbInput.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CommandAction.h" />
+    <ClInclude Include="CommandInput.h" />
     <ClInclude Include="CWTrainer.h" />
     <ClInclude Include="IInputDevice.h" />
     <ClInclude Include="MicInput.h" />
