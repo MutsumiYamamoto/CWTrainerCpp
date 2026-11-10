@@ -8,6 +8,8 @@ public:
 
     void ShowTitle();
     void ShowSelectMode();
+    void ShowSelectTrainingMode();
+	void ShowInputQuestionNum();
 
     void ShowTiming(
         int ditMs,
@@ -16,6 +18,8 @@ public:
         int wordGapMs);
 
     void ShowCallSign();
+
+	void ShowTrainingStart();
 
     void ShowBuffer(
         const std::string& text);

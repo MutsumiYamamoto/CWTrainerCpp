@@ -13,8 +13,8 @@
 #include <portaudio.h>
 
 #include "MorseDecoder.h"
-#include "SingleInput.h"
 #include "IInputDevice.h"
+#include "Training.h"
 
 
 
@@ -90,56 +90,80 @@ int CWTrainer::Run()
     //タイトルの表示
     display.ShowTitle();
 
-    //モードの表示
+
+    //トレーニンぐモードの表示
+	display.ShowSelectTrainingMode();
+    //トレーニングモード選択
+	char trainingModeChar;
+	cin >> trainingModeChar;
+
+    TrainingMode trainingMode;
+    //トレーニングモードを初期化
+	switch (tolower(trainingModeChar))
+    {
+    case 'n':
+        trainingMode = TrainingMode::Normal;
+		training = new NormalTraining();
+        break;
+    case 'r':
+        trainingMode = TrainingMode::Random;
+		training = new RandomTraining();
+        break;
+    case 'c':
+        trainingMode = TrainingMode::CW;
+		training = new CWTraining();
+        break;
+    case 'o':
+        trainingMode = TrainingMode::Original;
+		training = new OriginalTraining();
+        break;
+    default:
+        break;
+    }
+
+	training->Initialize();
+
+
+    //入力モードの表示
     display.ShowSelectMode();
-
-    cout << "Select > ";
-
+    //入力モード選択
     char modeChar;
     cin >> modeChar;
 
     InputMode mode;
 
+    //各入力クラスのインスタンスを初期化
     MicInput* mic = nullptr; // switch文の前で宣言・初期化
-
 
     switch (tolower(modeChar))
     {
     case 'u':
         mode = InputMode::USB;
 
-        inputDevice =
-            new UsbInput();
+        inputDevice = new UsbInput();
 
         break;
 
     case 'p':
         mode = InputMode::Paddle;
 
-        inputDevice =
-            new PaddleInput();
+        inputDevice = new PaddleInput();
 
         break;
 
     case 's':
         mode = InputMode::Single;
 
-        inputDevice =
-            new SingleInput(
-                thresholdMs);
+        inputDevice = new SingleInput(thresholdMs);
 
         break;
 
     case 'm':
         mode = InputMode::Mic;
 
-        inputDevice =
-            new MicInput(
-                thresholdMs);
+        inputDevice = new MicInput(thresholdMs);
 
-        mic =
-            dynamic_cast<MicInput*>(
-                inputDevice);
+        mic = dynamic_cast<MicInput*>(inputDevice);
 
         if (!mic->Initialize())
         {
@@ -226,144 +250,153 @@ int CWTrainer::Run()
             characterDecoded = false;
         };
 
+    display.ShowTrainingStart();
 
 
-
-
-
-    while (true)
+	bool running = true;
+    while (running)
     {
-        //-----------------------------------
-        // コマンド入力
-        //-----------------------------------
-        auto action =
-            commandInput.Poll();
-
-        switch (action)
+        training->questionPosing();
+		bool section = true;
+        while (section)
         {
-        case CommandAction::Exit:
+            //-----------------------------------
+            // キーコマンド処理
+            //-----------------------------------
+            auto action =
+                commandInput.Poll();
+            switch (action)
+            {
+            case CommandAction::Exit:
+                //            return 0;
+                section = false;
+                running = false;
+                break;
 
-            return 0;
+            case CommandAction::Next:
+                section = false;
+                break;
 
-        case CommandAction::ClearBuffer:
+            case CommandAction::ClearBuffer:
+                translatedText.clear();
+                display.ShowBufferCleared();
+                break;
 
-            translatedText.clear();
+            case CommandAction::DisplayBuffer:
+                display.ShowBuffer(translatedText);
+                section = false;
+                break;
 
-            display.ShowBufferCleared();
+            default:
+                break;
+            }
 
-            display.ShowCallSign();
+            //-----------------------------------
+            // 各動作モード（継承済）での処理
+            //-----------------------------------
 
-            break;
+            auto result =
+                inputDevice->Poll();
 
-        case CommandAction::DisplayBuffer:
+            switch (result)
+            {
+            case MorseElement::Dit:
 
-            display.ShowBuffer(
-                translatedText);
+                if (mode == InputMode::USB)
+                {
+                    cout << "[DIT]";
+                }
 
-            display.ShowCallSign();
+                AddDit();
 
-            break;
+                break;
 
-        default:
+            case MorseElement::Dah:
 
-            break;
+                if (mode == InputMode::USB)
+                {
+                    cout << "[DAH]";
+                }
+
+                AddDah();
+
+                break;
+
+            default:
+
+                break;
+            }
+
+            auto now = steady_clock::now(); // 現在時刻取得
+
+            auto idleMs = duration_cast<milliseconds>
+                (now - lastInputTime).count(); // 最後のキー入力からの経過時間（ミリ秒）
+
+            //-----------------------------------
+            // 文字確定
+            //-----------------------------------
+
+            if (!characterDecoded &&        // 文字確定前
+                !currentMorse.empty() &&    // モールス信号が入力されている
+                idleMs >= charGapMs)        // 一定時間入力がなければ文字確定
+            {
+                MorseDecoder decoder;
+                std::string result = decoder.Decode(currentMorse); // result を宣言して代入
+
+                if (!result.empty())
+                {
+                    translatedText += result;
+                    // history.push_back({ currentMorse, result });
+                    history.emplace_back(currentMorse, result);
+                    // history.push_back(HistoryItem{ currentMorse, result });
+
+                    display.ShowCharacter(
+                        result);
+                }
+                else
+                {
+                    display.ShowUnknownCharacter();
+                }
+
+                currentMorse.clear();                           //入力文字クリア
+                characterDecoded = true;                        //キー入力受付フラグON
+            }
+
+            //-----------------------------------
+            // 単語区切り
+            //-----------------------------------
+
+            if (characterDecoded &&         // 文字確定済み
+                idleMs >= wordGapMs)       // 一定時間入力がなければ単語区切り
+            {
+                if (!translatedText.empty() &&
+                    translatedText.back() != ' ')
+                {
+                    translatedText += ' ';  //単語確定
+
+                    display.ShowWord(
+                        translatedText);    //翻訳済み文字列を画面に表示
+                }
+
+                lastInputTime = steady_clock::now();
+            }
+
+            Sleep(10);
         }
 
-        //-----------------------------------
-        // 各動作モード（継承済）での処理
-        //-----------------------------------
+        training->checkAnswer();    //解答を判定
+        //スコア集計
 
-        auto result =
-            inputDevice->Poll();
+		//次の問題へ
 
-        switch (result)
-        {
-        case MorseElement::Dit:
-
-            if (mode == InputMode::USB)
-            {
-                cout << "[DIT]";
-            }
-
-            AddDit();
-
-            break;
-
-        case MorseElement::Dah:
-
-            if (mode == InputMode::USB)
-            {
-                cout << "[DAH]";
-            }
-
-            AddDah();
-
-            break;
-
-        default:
-
-            break;
-        }
-
-        auto now = steady_clock::now(); // 現在時刻取得
-
-        auto idleMs = duration_cast<milliseconds>
-            (now - lastInputTime).count(); // 最後のキー入力からの経過時間（ミリ秒）
-
-        //-----------------------------------
-        // 文字確定
-        //-----------------------------------
-
-        if (!characterDecoded &&        // 文字確定前
-            !currentMorse.empty() &&    // モールス信号が入力されている
-            idleMs >= charGapMs)        // 一定時間入力がなければ文字確定
-        {
-            MorseDecoder decoder;
-            std::string result = decoder.Decode(currentMorse); // result を宣言して代入
-
-            if (!result.empty())
-            {
-                translatedText += result;
-                // history.push_back({ currentMorse, result });
-                history.emplace_back(currentMorse, result);
-                // history.push_back(HistoryItem{ currentMorse, result });
-
-                display.ShowCharacter(
-                    result);
-            }
-            else
-            {
-                display.ShowUnknownCharacter();
-            }
-
-            currentMorse.clear();                           //入力文字クリア
-            characterDecoded = true;                        //キー入力受付フラグON
-        }
-
-        //-----------------------------------
-        // 単語区切り
-        //-----------------------------------
-
-        if (characterDecoded &&         // 文字確定済み
-            idleMs >= wordGapMs)       // 一定時間入力がなければ単語区切り
-        {
-            if (!translatedText.empty() &&
-                translatedText.back() != ' ')
-            {
-                translatedText += ' ';  //単語確定
-
-                display.ShowWord(
-                    translatedText);    //翻訳済み文字列を画面に表示
-            }
-
-            lastInputTime = steady_clock::now();
-        }
-
-        Sleep(10);
     }
 
-    display.ShowResult(
-        translatedText);
+
+    display.ShowResult(translatedText);
+
+
+
+
 
 
     if (mode == InputMode::Mic)

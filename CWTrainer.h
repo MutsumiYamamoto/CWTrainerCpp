@@ -11,6 +11,7 @@
 #include "MicInput.h"
 #include "CommandInput.h"
 #include "DisplayManager.h"
+#include "Training.h"
 
 struct HistoryItem
 {
@@ -35,6 +36,13 @@ enum class InputMode
     Mic
 };
 
+enum class TrainingMode
+{
+    Normal,
+    Random,
+    CW,
+    Original
+};
 
 class CWTrainer
 {
@@ -76,5 +84,7 @@ private:
 	CommandInput commandInput;
 
     DisplayManager display;
+
+	Training* training; // ← 追加: Training型のポインタをメンバーとして宣言
 
 };

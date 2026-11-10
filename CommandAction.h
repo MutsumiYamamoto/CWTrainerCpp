@@ -8,5 +8,7 @@ enum class CommandAction
 
     ClearBuffer,
 
-    DisplayBuffer
+    DisplayBuffer,
+
+	Next
 };

@@ -19,8 +19,9 @@ void DisplayManager::ShowTitle()
         << "      CW Trainer\n";
 
     std::cout
-        << "=========================\n\n";
+        << "=========================\n";
 }
+
 void DisplayManager::ShowSelectMode()
 {
     std::cout
@@ -29,21 +30,54 @@ void DisplayManager::ShowSelectMode()
     std::cout << "u : *USB Paddle\n";
     std::cout << "p : PC Paddle (H/T)\n";
     std::cout << "s : Single Key (SPACE)\n";
-    std::cout << "m : *input MIC\n\n";
+    std::cout << "m : *input MIC\n";
+    std::cout << "Select > ";
 
     //    std::cout
     //        << "\n*****************************************\n";
 }
 
+void DisplayManager::ShowSelectTrainingMode()
+{
+    std::cout
+        << "\n***** SELECT TRAINING MODE *****\n";
+
+    std::cout << "n : NORMAL\n";       //打って表示するだけのモード
+	std::cout << "r : RANDOM\n";       //ランダムなお題を出題するモード
+    std::cout << "c : CW\n";           //CW（定型文）の練習モード
+    std::cout << "o : ORIGINAL\n";    //独自に作成した問題を出題するモード
+    std::cout << "Select > ";
+
+    //    std::cout
+    //        << "\n*****************************************\n";
+}
+
+void DisplayManager::ShowInputQuestionNum()
+{
+    std::cout << "How many Questions?" << std::endl;
+
+
+}
+
 void DisplayManager::ShowCallSign()
 {
     std::cout
-        << "\n***** My call signe *****\n";
+        << "\n***** My call signe *****";
 
     std::cout
-        << "JL1IRF(.---/.-../.----/../.-./..-.)\n";
+        << "\nJL1IRF(.---/.-../.----/../.-./..-.)\n";
+//    std::cout
+//        << "\n*****************************************\n";
+}
+
+void DisplayManager::ShowTrainingStart()
+{
     std::cout
-        << "\n*****************************************\n";
+        << "\n***** Start Training! *****\n";
+    std::cout
+        << "=========================\n";
+
+
 }
 
 void DisplayManager::ShowKeyCommands()
@@ -52,7 +86,7 @@ void DisplayManager::ShowKeyCommands()
         << "\n***** KEY COMMANDS *****\n";
 
     std::cout
-        << "TAB = Disp\n";
+        << "TAB = Display Buffer and Next Question\n";
     std::cout
         << "DELETE = Clear\n";
     std::cout

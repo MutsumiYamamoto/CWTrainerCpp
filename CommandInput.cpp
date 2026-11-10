@@ -15,6 +15,16 @@ CommandAction CommandInput::Poll()
     }
 
     //-----------------------------------
+    // SHIFT
+    //-----------------------------------
+
+    if (GetAsyncKeyState(VK_SHIFT)
+        & 0x8000)
+    {
+        return CommandAction::Next;
+    }
+
+    //-----------------------------------
     // DELETE
     //-----------------------------------
 
