@@ -55,7 +55,8 @@ void CWTrainer::AddDah()
 }
 
 CWTrainer::CWTrainer()
-    : inputDevice(nullptr) // ここで明示的に初期化
+    : inputDevice(nullptr), // ここで明示的に初期化
+      training(nullptr)     // trainingメンバーもnullptrで初期化
 {
     wpm = 20;
 
@@ -131,7 +132,6 @@ int CWTrainer::Run()
     cin >> modeChar;
 
     InputMode mode;
-
     //各入力クラスのインスタンスを初期化
     MicInput* mic = nullptr; // switch文の前で宣言・初期化
 
@@ -139,32 +139,23 @@ int CWTrainer::Run()
     {
     case 'u':
         mode = InputMode::USB;
-
         inputDevice = new UsbInput();
-
         break;
 
     case 'p':
         mode = InputMode::Paddle;
-
         inputDevice = new PaddleInput();
-
         break;
 
     case 's':
         mode = InputMode::Single;
-
         inputDevice = new SingleInput(thresholdMs);
-
         break;
 
     case 'm':
         mode = InputMode::Mic;
-
         inputDevice = new MicInput(thresholdMs);
-
         mic = dynamic_cast<MicInput*>(inputDevice);
-
         if (!mic->Initialize())
         {
             return -1;
@@ -253,11 +244,10 @@ int CWTrainer::Run()
     display.ShowTrainingStart();
 
 
-	bool running = true;
     while (running)
     {
         training->questionPosing();
-		bool section = true;
+		section = true;
         while (section)
         {
             //-----------------------------------
@@ -268,7 +258,6 @@ int CWTrainer::Run()
             switch (action)
             {
             case CommandAction::Exit:
-                //            return 0;
                 section = false;
                 running = false;
                 break;
@@ -384,15 +373,23 @@ int CWTrainer::Run()
             Sleep(10);
         }
 
-        training->checkAnswer();    //解答を判定
-        //スコア集計
+        // 必要な引数を渡してcheckAnswerを呼び出す
+        // 例: translatedTextを引数として渡す（Training::checkAnswerの定義に合わせて修正してください）
+        if (true == training->checkAnswer(translatedText)) {    //解答を判定
+			training->correctNum++; // 正解数をカウント
+            training->AddScore(10); // スコア集計
+            std::cout << "Correct! Score: " << training->GetTotalScore() << std::endl;
+        }
+        else {
+            std::cout << "Not Correct! Score: " << training->GetTotalScore() << std::endl;
 
+        }
 		//次の問題へ
-
+        translatedText.clear();
     }
 
 
-    display.ShowResult(translatedText);
+    display.ShowResult(training->GetTotalScore(),training->GetTotalQuestion(),training->GetCorrectNum());
 
 
 

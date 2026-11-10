@@ -35,7 +35,7 @@ public:
         const std::string& word);
 
     void ShowResult(
-        const std::string& text);
+        const int totaScore, const int totalQuestion, const int correctNum);
 
     void ShowKeyCommands();
 

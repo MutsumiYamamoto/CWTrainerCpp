@@ -1,4 +1,5 @@
 #include "DisplayManager.h"
+#include "Training.h"
 
 #include <windows.h>
 #include <chrono>
@@ -9,6 +10,7 @@
 #include <unordered_map>
 #include <vector>
 #include <cmath>
+#include "CWTrainer.h"
 
 void DisplayManager::ShowTitle()
 {
@@ -100,10 +102,10 @@ void DisplayManager::ShowBuffer(
     const std::string& text)
 {
     std::cout
-        << "\n========== WORD BUFFER NOW ==============\n";
+        << "\n===== WORD BUFFER NOW =====\n";
 
     std::cout
-        << "CHAR : "
+        << "WORD : "
         << text
         << "\n";
 }
@@ -111,10 +113,10 @@ void DisplayManager::ShowBuffer(
 void DisplayManager::ShowBufferCleared()
 {
     std::cout
-        << "\n========== WORD BUFFER CLEARED ==========\n";
+        << "\n===== WORD BUFFER CLEARED =====\n";
 
     std::cout
-        << "CHAR : \n";
+        << "WORD : \n";
 }
 
 void DisplayManager::ShowCharacter(
@@ -136,17 +138,16 @@ void DisplayManager::ShowWord(
 }
 
 void DisplayManager::ShowResult(
-    const std::string& text)
+    const int totaScore, const int totalQuestion, const int correctNum )
 {
-    std::cout
-        << "\n\n========== RESULT ==========\n";
+    std::cout << "\n\n========== RESULT ==========\n";
 
-    std::cout
-        << text
-        << "\n";
+    std::cout << "Total Score:      " << totaScore << "points" << std::endl;
+	std::cout << " Total Questions: " << totalQuestion << std::endl;
+    std::cout << "  Correct:        " << correctNum << std::endl;
+    std::cout << "  Incorrect:      " << totalQuestion - correctNum << std::endl;
 
-    std::cout
-        << "\n=============================\n";
+    std::cout << "=============================\n";
 }
 
 void DisplayManager::ShowTiming(

@@ -67,6 +67,9 @@ private:
 
     std::vector<HistoryItem> history;
 
+    bool running = true;
+    bool section = true;
+
     int wpm;
 
     int ditMs;
