@@ -70,6 +70,18 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <RunCodeAnalysis>true</RunCodeAnalysis>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <RunCodeAnalysis>true</RunCodeAnalysis>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <RunCodeAnalysis>true</RunCodeAnalysis>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <RunCodeAnalysis>true</RunCodeAnalysis>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -146,6 +158,7 @@
     <ClCompile Include="MicInput.cpp" />
     <ClCompile Include="MorseDecoder.cpp" />
     <ClCompile Include="PaddleInput.cpp" />
+    <ClCompile Include="ScoreManager.cpp" />
     <ClCompile Include="SingleInput.cpp" />
     <ClCompile Include="Training.cpp" />
     <ClCompile Include="UsbInput.cpp" />
@@ -160,6 +173,8 @@
     <ClInclude Include="MorseDecoder.h" />
     <ClInclude Include="MorseElement.h" />
     <ClInclude Include="PaddleInput.h" />
+    <ClInclude Include="RandomTraining.h" />
+    <ClInclude Include="ScoreManager.h" />
     <ClInclude Include="SingleInput.h" />
     <ClInclude Include="Training.h" />
     <ClInclude Include="UsbInput.h" />

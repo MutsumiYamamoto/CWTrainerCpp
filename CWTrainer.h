@@ -90,4 +90,6 @@ private:
 
 	Training* training; // ← 追加: Training型のポインタをメンバーとして宣言
 
+	ScoreManager* score; // ← 追加: Score型のポインタをメンバーとして宣言
+
 };

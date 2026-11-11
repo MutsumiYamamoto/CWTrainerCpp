@@ -64,38 +64,60 @@ void DisplayManager::ShowInputQuestionNum()
 void DisplayManager::ShowCallSign()
 {
     std::cout
-        << "\n***** My call signe *****";
+        << "\n***** My call signe *****\n";
 
     std::cout
-        << "\nJL1IRF(.---/.-../.----/../.-./..-.)\n";
-//    std::cout
-//        << "\n*****************************************\n";
+        << "JL1IRF(.---/.-../.----/../.-./..-.)\n";
+
+}
+
+void DisplayManager::ShowHelp()
+{
+    std::cout << "\n***** HELP *****\n";
+	this->ShowKeyCommands();
+    this->ShowMorseSignal();
+    this->ShowCallSign();
+
 }
 
 void DisplayManager::ShowTrainingStart()
 {
     std::cout
         << "\n***** Start Training! *****\n";
-    std::cout
-        << "=========================\n";
-
 
 }
 
 void DisplayManager::ShowKeyCommands()
 {
-    std::cout
-        << "\n***** KEY COMMANDS *****\n";
+    std::cout << "\n***** KEY COMMANDS *****\n";
 
-    std::cout
-        << "TAB = Display Buffer and Next Question\n";
-    std::cout
-        << "DELETE = Clear\n";
-    std::cout
-        << "ESC = Exit\n";
+    std::cout << "TAB = Display Buffer and Next Question\n";
+    std::cout << "DELETE = Clear\n";
+    std::cout << "ESC = Exit\n";
 
 //    std::cout
 //        << "\n*****************************************\n";
+}
+void DisplayManager::ShowMorseSignal()
+{
+
+    std::cout << "\n***** MORSE CODE TABLE *****\n";
+    this->ShowMorseCodeTable();
+
+    //    std::cout
+    //        << "\n*****************************************\n";
+}
+
+void DisplayManager::ShowMorseCodeTable()
+{
+    // モールス符号表の一例（必要に応じて拡張可能）
+    std::cout << "A: .-\tB: -...\tC: -.-.\tD: -..\tE: .\n";
+    std::cout << "F: ..-.\tG: --.\tH: ....\tI: ..\tJ: .---\n";
+    std::cout << "K: -.-\tL: .-..\tM: --\tN: -.\tO: ---\n";
+    std::cout << "P: .--.\tQ: --.-\tR: .-.\tS: ...\tT: -\n";
+    std::cout << "U: ..-\tV: ...-\tW: .--\tX: -..-\tY: -.--\tZ: --..\n";
+    std::cout << "1: .----\t2: ..---\t3: ...--\t4: ....-\t5: .....\n";
+    std::cout << "6: -....\t7: --...\t8: ---..\t9: ----.\t0: -----\n";
 }
 
 void DisplayManager::ShowBuffer(
@@ -142,7 +164,7 @@ void DisplayManager::ShowResult(
 {
     std::cout << "\n\n========== RESULT ==========\n";
 
-    std::cout << "Total Score:      " << totaScore << "points" << std::endl;
+    std::cout << "Total Score:      " << totaScore << " points" << std::endl;
 	std::cout << " Total Questions: " << totalQuestion << std::endl;
     std::cout << "  Correct:        " << correctNum << std::endl;
     std::cout << "  Incorrect:      " << totalQuestion - correctNum << std::endl;

@@ -1,5 +1,7 @@
 #include "MorseDecoder.h"
 
+
+
 MorseDecoder::MorseDecoder()
 {
     table[".-"] = "A";
@@ -52,3 +54,4 @@ std::string MorseDecoder::Decode(
 
     return "?";
 }
+

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <iostream>
 
 class DisplayManager
 {
@@ -9,7 +10,7 @@ public:
     void ShowTitle();
     void ShowSelectMode();
     void ShowSelectTrainingMode();
-	void ShowInputQuestionNum();
+    void ShowInputQuestionNum();
 
     void ShowTiming(
         int ditMs,
@@ -19,7 +20,7 @@ public:
 
     void ShowCallSign();
 
-	void ShowTrainingStart();
+    void ShowTrainingStart();
 
     void ShowBuffer(
         const std::string& text);
@@ -39,4 +40,10 @@ public:
 
     void ShowKeyCommands();
 
+    void ShowHelp();
+
+    void ShowMorseSignal();
+
+    void ShowMorseCodeTable();
 };
+

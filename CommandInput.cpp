@@ -15,14 +15,22 @@ CommandAction CommandInput::Poll()
     }
 
     //-----------------------------------
-    // SHIFT
+    // F1
     //-----------------------------------
+    bool helpNow =
+        (GetAsyncKeyState(VK_F1)
+            & 0x8000) != 0;
 
-    if (GetAsyncKeyState(VK_SHIFT)
-        & 0x8000)
+    if (helpNow &&
+        !f1Pressed)
     {
-        return CommandAction::Next;
+        f1Pressed = true;
+
+        return CommandAction::Help;
     }
+
+    f1Pressed = helpNow;
+   
 
     //-----------------------------------
     // DELETE

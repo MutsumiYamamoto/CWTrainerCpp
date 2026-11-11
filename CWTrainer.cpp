@@ -15,9 +15,9 @@
 #include "MorseDecoder.h"
 #include "IInputDevice.h"
 #include "Training.h"
-
-
-
+#include "RandomTraining.h"
+#include "DisplayManager.h"
+#include "ScoreManager.h"
 
 using namespace std;
 using namespace std::chrono;
@@ -56,7 +56,8 @@ void CWTrainer::AddDah()
 
 CWTrainer::CWTrainer()
     : inputDevice(nullptr), // ここで明示的に初期化
-      training(nullptr)     // trainingメンバーもnullptrで初期化
+      training(nullptr),    // trainingメンバーもnullptrで初期化
+      score(nullptr)        // scoreメンバーもnullptrで初期化
 {
     wpm = 20;
 
@@ -75,9 +76,6 @@ CWTrainer::CWTrainer()
         steady_clock::now();
 
     characterDecoded = true;
-
-
-
 }
 
 CWTrainer::~CWTrainer()
@@ -91,15 +89,18 @@ int CWTrainer::Run()
     //タイトルの表示
     display.ShowTitle();
 
+    //スコア管理のインスタンス初期化
+    score = new ScoreManager();
 
-    //トレーニンぐモードの表示
+
+    //トレーニングモードの表示
 	display.ShowSelectTrainingMode();
     //トレーニングモード選択
 	char trainingModeChar;
 	cin >> trainingModeChar;
 
     TrainingMode trainingMode;
-    //トレーニングモードを初期化
+    //トレーニングモードのインスタンスを初期化
 	switch (tolower(trainingModeChar))
     {
     case 'n':
@@ -167,6 +168,7 @@ int CWTrainer::Run()
 
         return 0;
     }
+
 
 
 
@@ -246,6 +248,9 @@ int CWTrainer::Run()
 
     while (running)
     {
+        training->questionCount++;
+        training->totalQuestion = training->questionCount;
+
         training->questionPosing();
 		section = true;
         while (section)
@@ -262,8 +267,8 @@ int CWTrainer::Run()
                 running = false;
                 break;
 
-            case CommandAction::Next:
-                section = false;
+            case CommandAction::Help:
+                display.ShowHelp();
                 break;
 
             case CommandAction::ClearBuffer:
@@ -377,11 +382,11 @@ int CWTrainer::Run()
         // 例: translatedTextを引数として渡す（Training::checkAnswerの定義に合わせて修正してください）
         if (true == training->checkAnswer(translatedText)) {    //解答を判定
 			training->correctNum++; // 正解数をカウント
-            training->AddScore(10); // スコア集計
-            std::cout << "Correct! Score: " << training->GetTotalScore() << std::endl;
+            score->AddScore(10); // スコア集計
+            std::cout << "Correct! Score: " << score->GetTotalScore() << std::endl;
         }
         else {
-            std::cout << "Not Correct! Score: " << training->GetTotalScore() << std::endl;
+            std::cout << "Not Correct!\n Score : " << score->GetTotalScore() << std::endl;
 
         }
 		//次の問題へ
@@ -389,7 +394,7 @@ int CWTrainer::Run()
     }
 
 
-    display.ShowResult(training->GetTotalScore(),training->GetTotalQuestion(),training->GetCorrectNum());
+    display.ShowResult(score->GetTotalScore(), training->GetTotalQuestion(), training->GetCorrectNum());
 
 
 

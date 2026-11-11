@@ -11,6 +11,7 @@ public:
     std::string Decode(
         const std::string& code);
 
+
 private:
     std::unordered_map<
         std::string,
