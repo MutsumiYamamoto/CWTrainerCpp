@@ -1,4 +1,5 @@
-#include "PaddleInput.h"
+#include "IInputDevice.h"
+
 
 #include <windows.h>
 

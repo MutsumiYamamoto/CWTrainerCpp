@@ -5,10 +5,7 @@
 #include <chrono>
 
 #include "MorseDecoder.h"
-#include "SingleInput.h"
-#include "PaddleInput.h"
-#include "UsbInput.h"
-#include "MicInput.h"
+#include "IInputDevice.h"
 #include "CommandInput.h"
 #include "DisplayManager.h"
 #include "Training.h"

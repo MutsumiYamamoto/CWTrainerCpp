@@ -1,0 +1,144 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="CommandInput" Collapsed="true">
+    <Position X="9.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAABAAAAAAAAAAAAAAAAACAAAAAAAAAAAEgA=</HashCode>
+      <FileName>CommandInput.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CWTrainer" Collapsed="true">
+    <Position X="11.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>gAAAAAAAAAEAQIABoQBICgAAAg0AQBAAAAAACAACAwI=</HashCode>
+      <FileName>CWTrainer.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DisplayManager" Collapsed="true">
+    <Position X="13.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAUAEAAAAAABAAAAEAAgQQQAgAAoCAAAgAAAAgAAgAA=</HashCode>
+      <FileName>DisplayManager.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="IInputDevice" Collapsed="true">
+    <Position X="3.75" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAACIAAAAAAAAAAACAAAAAAAAAAAAAA=</HashCode>
+      <FileName>IInputDevice.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PaddleInput" Collapsed="true">
+    <Position X="5" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAgAg=</HashCode>
+      <FileName>IInputDevice.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SingleInput" Collapsed="true">
+    <Position X="7.25" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACEAAAAAAAAAAAAgAACAAAAAAACAAAAAAAAAAAAAA=</HashCode>
+      <FileName>IInputDevice.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UsbInput" Collapsed="true">
+    <Position X="0.5" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAACAAAAAAAAAAAAgAAACAAAAAAAAAAAAAA=</HashCode>
+      <FileName>IInputDevice.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MicInput" Collapsed="true">
+    <Position X="2.75" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAASAAQIAAAAQAAAAACCAAAAMAACQABCAAAAAABgAQ=</HashCode>
+      <FileName>IInputDevice.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MorseDecoder" Collapsed="true">
+    <Position X="9.75" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAABAAAAAAIAAAAAAAAAAAAAAQAAAAAA=</HashCode>
+      <FileName>MorseDecoder.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Training" Collapsed="true">
+    <Position X="3.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAABAAABIAwAAAAAIAACAMgACAAAAAoCGQAAAAAA=</HashCode>
+      <FileName>Training.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RandomTraining" Collapsed="true">
+    <Position X="0.5" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>EAAAAAAAAAAAAQAAAAAAAAAAAgAAAAEACiAAAAAAAAA=</HashCode>
+      <FileName>Training.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="NormalTraining" Collapsed="true">
+    <Position X="2.75" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAQAAAAAAAAAAAgAAAAAIAgAAAAAAQAA=</HashCode>
+      <FileName>Training.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CWTraining" Collapsed="true">
+    <Position X="5" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAQAAAAAAAAAAAgAAAAAAAgAAAAIAAAI=</HashCode>
+      <FileName>Training.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OriginalTraining" Collapsed="true">
+    <Position X="7.25" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAIAAQAAAAAAAAAAAgAAAAAABgAAAAAAAAA=</HashCode>
+      <FileName>Training.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ScoreManager" Collapsed="true">
+    <Position X="11.5" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AABAAAAAAAAAAQABABCAAAgIAAAAAAABAAAAAAAICCA=</HashCode>
+      <FileName>ScoreManager.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Struct Name="HistoryItem" Collapsed="true">
+    <Position X="9.75" Y="2.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAIAAAAQAIAAAAAAAAAAA=</HashCode>
+      <FileName>CWTrainer.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Enum Name="CommandAction" Collapsed="true">
+    <Position X="9.75" Y="4" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAIAAAAAAAAAAAAAQAEAAAAIAAAAAEAAAA=</HashCode>
+      <FileName>CommandAction.h</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="InputMode" Collapsed="true">
+    <Position X="11.5" Y="4" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAEAAAAACAAAAAAAACAAAAAAAAAEA=</HashCode>
+      <FileName>CWTrainer.h</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="TrainingMode" Collapsed="true">
+    <Position X="9.75" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAJBAAAAAAAAAAAAAQ=</HashCode>
+      <FileName>CWTrainer.h</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="MorseElement" Collapsed="true">
+    <Position X="13.25" Y="4" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAIAAAAAAgAAAAAAAAAAAAAAAAAAAAAAEAAAA=</HashCode>
+      <FileName>MorseElement.h</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Font Name="Yu Gothic UI" Size="9" />
+</ClassDiagram>

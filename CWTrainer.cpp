@@ -15,7 +15,6 @@
 #include "MorseDecoder.h"
 #include "IInputDevice.h"
 #include "Training.h"
-#include "RandomTraining.h"
 #include "DisplayManager.h"
 #include "ScoreManager.h"
 
@@ -248,11 +247,13 @@ int CWTrainer::Run()
 
     while (running)
     {
-        training->questionCount++;
-        training->totalQuestion = training->questionCount;
+        if (training->piontCalculate) {
+            training->questionCount++;
+            training->totalQuestion = training->questionCount;
 
-        training->questionPosing();
-		section = true;
+            training->questionPosing();
+            section = true;
+        }
         while (section)
         {
             //-----------------------------------
@@ -278,7 +279,9 @@ int CWTrainer::Run()
 
             case CommandAction::DisplayBuffer:
                 display.ShowBuffer(translatedText);
-                section = false;
+                if (training->piontCalculate) {
+                    section = false;
+                }
                 break;
 
             default:
@@ -378,19 +381,24 @@ int CWTrainer::Run()
             Sleep(10);
         }
 
-        // 必要な引数を渡してcheckAnswerを呼び出す
-        // 例: translatedTextを引数として渡す（Training::checkAnswerの定義に合わせて修正してください）
-        if (true == training->checkAnswer(translatedText)) {    //解答を判定
-			training->correctNum++; // 正解数をカウント
-            score->AddScore(10); // スコア集計
-            std::cout << "Correct! Score: " << score->GetTotalScore() << std::endl;
-        }
-        else {
-            std::cout << "Not Correct!\n Score : " << score->GetTotalScore() << std::endl;
+        if (training->piontCalculate) {
+            // 必要な引数を渡してcheckAnswerを呼び出す
+            // 例: translatedTextを引数として渡す（Training::checkAnswerの定義に合わせて修正してください）
+            if (training->checkAnswer(translatedText)) {    //解答を判定
+                training->correctNum++; // 正解数をカウント
+                score->AddTotalScore(10); // スコア集計
+                std::cout << "Correct! Score: " << score->GetTotalScore() << std::endl;
+            }
+#if 0
+            else {
+                std::cout << "Not Correct!\n Score : " << score->GetTotalScore() << std::endl;
 
+            }
+#endif
+
+            //次の問題へ
+            translatedText.clear();
         }
-		//次の問題へ
-        translatedText.clear();
     }
 
 

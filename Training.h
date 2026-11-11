@@ -1,8 +1,8 @@
 #pragma once
+
 #include <iostream>
 #include <random>
 
-#include "Training.h"
 #include "ScoreManager.h"
 
 
@@ -16,8 +16,6 @@ public:
 
 	~Training() = default;
 
-	virtual	void Initialize();
-
 	void SetQuestionLength(int length) { questionLength = length; }
 
 //	std::string charactor = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
@@ -25,6 +23,9 @@ public:
 
 	int questionLength = 1; // –â‘è‚Ì•¶š”
 
+	bool piontCalculate = false;
+
+	virtual	void Initialize();
 
 	virtual void questionPosing();
 
@@ -45,6 +46,41 @@ public:
 	int totalQuestion;	//–â‘è”
 	int correctNum; // ³‰ğ”‚ğ’ÇÕ‚·‚éƒƒ“ƒo[•Ï”
 };
+
+
+
+
+class RandomTraining : public Training
+{
+private:
+	std::string candidates =
+		"ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+
+	std::string currentQuestion;    // ¡‰ñ‚Ì–â‘è
+
+	std::mt19937 mt{ std::random_device{}() };
+
+public:
+	RandomTraining() = default;
+	~RandomTraining() = default;
+
+	void Initialize() override;
+	void questionPosing() override;
+	bool checkAnswer(const std::string& answer) override;
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 class NormalTraining : public Training

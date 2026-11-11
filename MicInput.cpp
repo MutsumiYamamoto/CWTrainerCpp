@@ -1,4 +1,4 @@
-#include "MicInput.h"
+#include "IInputDevice.h"
 
 #include <iostream>
 #include <iomanip>

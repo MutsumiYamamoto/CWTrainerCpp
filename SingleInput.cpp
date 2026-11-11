@@ -1,4 +1,5 @@
-#include "SingleInput.h"
+#include "IInputDevice.h"
+
 
 #include <windows.h>
 

@@ -1,4 +1,5 @@
-#include "UsbInput.h"
+#include "IInputDevice.h"
+
 
 #include <windows.h>
 

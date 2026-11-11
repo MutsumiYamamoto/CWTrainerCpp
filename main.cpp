@@ -1,26 +1,15 @@
 #include "CWTrainer.h"
-#if 0
+#include <windows.h>
 
-CWTrainer
-„ 
-„¥„Ÿ CommandInput
-„ 
-„¥„Ÿ DisplayManager
-„ 
-„¥„Ÿ SingleInput
-„ 
-„¥„Ÿ PaddleInput
-„ 
-„¥„Ÿ UsbInput
-„ 
-„¤„Ÿ MicInput
 
-#endif
 
 
 int main()
 {
     CWTrainer trainer;
+
+    SetConsoleOutputCP(CP_UTF8);
+    SetConsoleCP(CP_UTF8);
 
     return trainer.Run();
 }
