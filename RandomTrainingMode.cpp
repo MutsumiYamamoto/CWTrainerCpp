@@ -1,12 +1,12 @@
-#include "Training.h"
+#include "TrainingMode.h"
 
-void RandomTraining::Initialize()
+void RandomTrainingMode::Initialize()
 {
 	//ランダムモードの初期化処理
 	std::cout << "RandomTraining Initialized" << std::endl;
-	this->piontCalculate = true;
+	this->piontCalculate = true;	//ランダムモードでは、正解数をカウントするためにpiontCalculateをtrueに設定
 }
-void RandomTraining::questionPosing()
+void RandomTrainingMode::questionPosing()
 {
 	// 1～5文字のランダム長
 	std::uniform_int_distribution<> lenDist(1, questionLength);
@@ -31,7 +31,7 @@ void RandomTraining::questionPosing()
 		<< std::endl;
 }
 
-bool RandomTraining::checkAnswer(const std::string& answer)
+bool RandomTrainingMode::checkAnswer(const std::string& answer)
 {
 	std::string trimmed = answer;
 	trimmed.erase(trimmed.find_last_not_of(" \t\r\n") + 1);

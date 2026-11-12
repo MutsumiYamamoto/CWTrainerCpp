@@ -1,4 +1,4 @@
-#include "Training.h"
+#include "TrainingMode.h"
 
 Training::Training()
 	: score(nullptr),

@@ -4,6 +4,7 @@
 #include <random>
 
 #include "ScoreManager.h"
+#include "ScenarioManager.h"
 
 
 class Training
@@ -23,7 +24,7 @@ public:
 
 	int questionLength = 1; // 問題の文字数
 
-	bool piontCalculate = false;
+	bool piontCalculate = false;	//出題時にポイント計算を行うかどうかのフラグ
 
 	virtual	void Initialize();
 
@@ -50,7 +51,7 @@ public:
 
 
 
-class RandomTraining : public Training
+class RandomTrainingMode : public Training
 {
 private:
 	std::string candidates =
@@ -61,8 +62,8 @@ private:
 	std::mt19937 mt{ std::random_device{}() };
 
 public:
-	RandomTraining() = default;
-	~RandomTraining() = default;
+	RandomTrainingMode() = default;
+	~RandomTrainingMode() = default;
 
 	void Initialize() override;
 	void questionPosing() override;
@@ -70,24 +71,11 @@ public:
 };
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-class NormalTraining : public Training
+class NormalTrainingMode : public Training
 {
 public:
-	NormalTraining() = default;
-	~NormalTraining() = default;
+	NormalTrainingMode() = default;
+	~NormalTrainingMode() = default;
 
 	void Initialize() override
 	{
@@ -95,6 +83,7 @@ public:
 		std::cout << "NormalTraining Initialized" << std::endl;
 
 	}
+#if 0
 	void questionPosing() override
 	{
 
@@ -113,67 +102,35 @@ public:
 		//通常モードでは判定せずに、常にデコードを繰り返す
 		return true;
 	}
+#endif
+
 };
 
 
 
-class CWTraining : public Training
+class CWTrainingMode : public Training
 {
 	public:
-	CWTraining() = default;
-	~CWTraining() = default;
+	CWTrainingMode() = default;
+	~CWTrainingMode() = default;
 
-	void Initialize() override
-	{
-		//CWモードの初期化処理
-		std::cout << "CWTraining Initialized" << std::endl;
-	}
-	void questionPosing() override
-	{
-		//CWモードの問題出題処理
-		std::cout << "CWTraining Question" << std::endl;
-		//CWモードでは、実際更新をしているようなシナリオに応答する
-
-	}
-	bool checkAnswer(const std::string& answer) override
-	{
-		//CWモードの解答判定処理
-		std::cout << "CWTraining Answer" << std::endl;
-
-		std::string trimmed = answer;
-		trimmed.erase(trimmed.find_last_not_of(" \t\r\n") + 1);
-		std::cout << "Question " << this->questionCount << ": " << charactor
-			<< " (Answer: " << trimmed << ")" << std::endl;
-		return charactor == trimmed;
-	}
+	void Initialize() override;
+	void questionPosing() override;
+	bool checkAnswer(const std::string& answer) override;
 };
 
-class OriginalTraining : public Training
+
+class OriginalTrainingMode : public Training
 {
-	public:
-	OriginalTraining() = default;
-	~OriginalTraining() = default;
+private:
+	ScenarioManager* scenarioManager;
+	std::string currentQuestion;
 
-	void Initialize() override
-	{
-		//独自モードの初期化処理
-		std::cout << "OriginalTraining Initialized" << std::endl;
-	}
-	void questionPosing() override
-	{
-		//独自モードの問題出題処理
-		std::cout << "OriginalTraining Question" << std::endl;
-		//独自のシナリオで問題を作成
+public:
+	OriginalTrainingMode() = default;
+	~OriginalTrainingMode() = default;
 
-	}
-	bool checkAnswer(const std::string& answer) override
-	{
-		//独自モードの解答判定処理
-		std::cout << "OriginalTraining Answer" << std::endl;
-		std::string trimmed = answer;
-		trimmed.erase(trimmed.find_last_not_of(" \t\r\n") + 1);
-		std::cout << "Question " << this->questionCount << ": " << charactor
-			<< " (Answer: " << trimmed << ")" << std::endl;
-		return charactor == trimmed;
-	}
+	void Initialize() override;
+	void questionPosing() override;
+	bool checkAnswer(const std::string& answer) override;
 };

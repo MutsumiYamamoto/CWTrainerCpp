@@ -14,7 +14,7 @@
 
 #include "MorseDecoder.h"
 #include "IInputDevice.h"
-#include "Training.h"
+#include "TrainingMode.h"
 #include "DisplayManager.h"
 #include "ScoreManager.h"
 
@@ -104,19 +104,19 @@ int CWTrainer::Run()
     {
     case 'n':
         trainingMode = TrainingMode::Normal;
-		training = new NormalTraining();
+		training = new NormalTrainingMode();
         break;
     case 'r':
         trainingMode = TrainingMode::Random;
-		training = new RandomTraining();
+		training = new RandomTrainingMode();
         break;
     case 'c':
         trainingMode = TrainingMode::CW;
-		training = new CWTraining();
+		training = new CWTrainingMode();
         break;
     case 'o':
         trainingMode = TrainingMode::Original;
-		training = new OriginalTraining();
+		training = new OriginalTrainingMode();
         break;
     default:
         break;

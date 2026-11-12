@@ -153,15 +153,18 @@
   <ItemGroup>
     <ClCompile Include="CommandInput.cpp" />
     <ClCompile Include="CWTrainer.cpp" />
+    <ClCompile Include="CWTrainingMode.cpp" />
     <ClCompile Include="DisplayManager.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MicInput.cpp" />
     <ClCompile Include="MorseDecoder.cpp" />
+    <ClCompile Include="OriginalTrainingMode.cpp" />
     <ClCompile Include="PaddleInput.cpp" />
-    <ClCompile Include="RandomTraining.cpp" />
+    <ClCompile Include="RandomTrainingMode.cpp" />
+    <ClCompile Include="ScenarioManager.cpp" />
     <ClCompile Include="ScoreManager.cpp" />
     <ClCompile Include="SingleInput.cpp" />
-    <ClCompile Include="Training.cpp" />
+    <ClCompile Include="TrainingMode.cpp" />
     <ClCompile Include="UsbInput.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -173,7 +176,8 @@
     <ClInclude Include="MorseDecoder.h" />
     <ClInclude Include="MorseElement.h" />
     <ClInclude Include="ScoreManager.h" />
-    <ClInclude Include="Training.h" />
+    <ClInclude Include="TrainingMode.h" />
+    <ClInclude Include="ScenarioManager.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ClassDiagram.cd" />

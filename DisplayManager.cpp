@@ -1,5 +1,5 @@
 #include "DisplayManager.h"
-#include "Training.h"
+#include "TrainingMode.h"
 
 #include <windows.h>
 #include <chrono>

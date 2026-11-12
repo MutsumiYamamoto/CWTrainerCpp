@@ -8,7 +8,7 @@
 #include "IInputDevice.h"
 #include "CommandInput.h"
 #include "DisplayManager.h"
-#include "Training.h"
+#include "TrainingMode.h"
 
 struct HistoryItem
 {
